@@ -4,6 +4,7 @@ from mxcube3 import socketio
 from mxcube3 import app as mxcube
 from mxcube3.routes import Utils
 from mxcube3.routes import qutils
+from sample_changer.GenericSampleChanger import SampleChangerState
 
 
 def last_queue_node():
@@ -117,14 +118,35 @@ def sc_state_changed(*args):
     if mxcube.sample_changer.getLoadedSample():
       location =  mxcube.sample_changer.getLoadedSample().getAddress()
 
-    if new_state == 9 and old_state == None:
+    if new_state == SampleChangerState.Moving and old_state == None:
         msg = {'signal': 'loadingSample',
                'location': location,
-               'message': 'Please wait, loading sample %s' % location}
+               'message': 'Please wait, operating sample changer'}
 
         socketio.emit('sc', msg, namespace='/hwr')
-        
-    elif new_state == 1 and old_state == 3:
+
+    elif new_state == SampleChangerState.Unloading:
+        msg = {'signal': 'loadingSample',
+               'location': location,
+               'message': 'Please wait, Unloading sample %s' % location}
+
+        socketio.emit('sc', msg, namespace='/hwr')
+
+    elif new_state == SampleChangerState.Loading:
+        msg = {'signal': 'loadingSample',
+               'location': location,
+               'message': 'Please wait, Loading sample %s' % location}
+
+        socketio.emit('sc', msg, namespace='/hwr')
+
+    elif new_state == SampleChangerState.Ready and old_state == SampleChangerState.Loading:
+        msg = {'signal': 'loadingSample',
+               'location': location,
+               'message': 'Please wait, Loaded sample %s' % location}
+
+        socketio.emit('sc', msg, namespace='/hwr')
+
+    elif new_state == SampleChangerState.Ready and old_state == None:
         msg = {'signal': 'loadedSample',
                'location': location}
     
