@@ -15,6 +15,7 @@ const initialState = {
   sampleList: {},
   manualMount: { set: false, id: 1 },
   displayData: {},
+  runNow: { runNow: false, sampleId: undefined, taskIndex: undefined },
   visibleList: 'current'
 };
 
@@ -24,7 +25,7 @@ export default (state = initialState, action) => {
       return Object.assign({}, state, { queue: action.queue });
     }
     case 'SET_SAMPLE_LIST': {
-      return Object.assign({}, state, { sampleList: action.sampleList });
+      return Object.assign({}, state, { sampleList: action.sampleList, sampleOrder: [] });
     }
     case 'APPEND_TO_SAMPLE_LIST': {
       const sampleList = { ...state.sampleList, [action.sampleData.sampleID]: action.sampleData };
@@ -32,7 +33,7 @@ export default (state = initialState, action) => {
     }
     case 'SET_SAMPLE_ORDER': {
       const sortedOrder = Object.entries(action.order).sort((a, b) => a[1] > b[1]);
-      const sampleOrder = [...state.sampleOrder];
+      const sampleOrder = [];
       let i = 0;
 
       // Use the grid order to generate the order of the samples in the queue
@@ -191,9 +192,7 @@ export default (state = initialState, action) => {
         }
       };
 
-      const sampleOrder = [...state.sampleOrder, sampleID];
-
-      return Object.assign({}, state, { displayData, queue, sampleOrder });
+      return Object.assign({}, state, { displayData, queue });
     }
     // Removing the task from the queue
     case 'REMOVE_TASK': {
@@ -227,7 +226,7 @@ export default (state = initialState, action) => {
           tasks:
           [
             ...state.queue[action.sampleID].tasks.slice(0, action.taskIndex),
-            action.taskData,
+            { ...state.queue[action.sampleID].tasks[action.taskIndex], parameters: action.params },
             ...state.queue[action.sampleID].tasks.slice(action.taskIndex + 1)
           ]
         }
@@ -235,8 +234,11 @@ export default (state = initialState, action) => {
 
       return Object.assign({}, state, { queue });
     }
-    // Run Mount, this will add the mounted sample to history
     case 'SET_CURRENT_SAMPLE':
+      if (state.current.node === action.sampleID) {
+        return Object.assign({}, state);
+      }
+
       return Object.assign({}, state,
         {
           current: { ...state.current, node: action.sampleID, running: false },
@@ -344,6 +346,12 @@ export default (state = initialState, action) => {
       {
         return { ...state, rootPath: action.data.rootPath,
                            manualMount: { set: state.manualMount.set, id: 1 } };
+      }
+    case 'SET_RUN_NOW':
+      {
+        return { ...state, runNow: { run: action.run,
+                                     sampleID: action.sampleID,
+                                     taskIndex: action.taskIndex } };
       }
     default:
       return state;
