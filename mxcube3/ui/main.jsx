@@ -31,6 +31,8 @@ if (module.hot) {
 }
 
 function requireAuth(nextState, replace) {
+  store.dispatch(getLoginInfo());
+
   if (!store.getState().login.loggedIn) {
     replace(null, '/login');
   }
@@ -76,7 +78,6 @@ export default class App extends React.Component {
                          'form', 'login', 'general', 'logger', 'points'],
              storage: new ServerStorage(this.serverIO) },
              () => {
-               store.dispatch(getLoginInfo());
                this.setState({ initialized: true });
              }
     );
