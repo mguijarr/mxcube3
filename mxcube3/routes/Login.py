@@ -4,11 +4,9 @@ from flask import session, request, jsonify, make_response
 from mxcube3 import app as mxcube
 from mxcube3.routes import qutils
 from mxcube3.routes import limsutils
-
+from mxcube3 import state_storage
 
 LOGGED_IN_USER = None
-MASTER = None
-
 
 @mxcube.route("/mxcube/api/v0.1/login", methods=["POST"])
 def login():
@@ -21,7 +19,6 @@ def login():
         :statuscode: 409: could not log in
     """
     global LOGGED_IN_USER
-    global MASTER
 
     content = request.get_json()
     loginID = content['proposal']
@@ -35,14 +32,8 @@ def login():
     if loginRes['status']['code'] == 'ok':
         session['loginInfo'] = { 'loginID': loginID, 'password': password, 'loginRes': loginRes }
         LOGGED_IN_USER = loginID
-        if not MASTER:
-            MASTER = session.sid
-#        loginRes structure
-#        {'status':{ "code": "ok", "msg": msg }, 'Proposal': proposal,
-#        'session': todays_session,
-#        "local_contact": self.get_session_local_contact(todays_session['session']['sessionId']),
-#        "person": prop['Person'],
-#        "laboratory": prop['Laboratory']}
+        if not state_storage.MASTER:
+            state_storage.set_master(session.sid)
 
     return make_response(loginRes['status']['code'], 200)
 
@@ -52,13 +43,12 @@ def signout():
     """
     Signout from Mxcube3 and clean the session
     """
-    #if MASTER == session['user_id']
-    global MASTER
     global LOGGED_IN_USER
 
     LOGGED_IN_USER = None
-    if session.sid == MASTER:
-        MASTER = None
+    if state_storage.is_master(session.sid):
+        state_storage.flush()
+        
     session.clear()
     return make_response("", 200)
 
@@ -71,7 +61,6 @@ def loginInfo():
                     "loginType": loginType, "loginRes": {'status':{ "code": "ok", "msg": msg }, 'Proposal': proposal, 'session': todays_session, "local_contact": local_contact, "person": someone, "laboratory": a_laboratory']} }
     """     
     global LOGGED_IN_USER
-    global MASTER
     loginInfo = session.get("loginInfo")
 
     if loginInfo is not None:
@@ -82,10 +71,11 @@ def loginInfo():
         # auto log in
         loginInfo["loginRes"] = limsutils.lims_login(loginID, loginInfo["password"])
         LOGGED_IN_USER = loginID
-        if not MASTER:
-            MASTER = session.sid
+        if not state_storage.MASTER:
+            state_storage.set_master(session.sid)
         session['loginInfo'] = loginInfo
-  
+
+    print 'SESSION SID =', session.sid  
     mxcube.queue = qutils.get_queue(session)
     logging.getLogger('HWR').info('Loaded queue')
     logging.getLogger('HWR').info('[QUEUE] %s ' % qutils.queue_to_json())
@@ -96,6 +86,6 @@ def loginInfo():
                       "loginType": mxcube.db_connection.loginType.title(),
                       "loginRes": limsutils.convert_to_dict(loginInfo["loginRes"] if loginInfo is not None else {}),
                       "queue": qutils.queue_to_dict(),
-                      "master": MASTER == session.sid
+                      "master": state_storage.is_master(session.sid)
                     }
                   )

@@ -1,11 +1,23 @@
 from flask import request
 from flask.ext.socketio import emit, join_room, leave_room
 from mxcube3 import socketio
-from routes import Login
 import json
 
+MASTER = None
 UI_STATE = dict()
 
+def set_master(master_sid):
+    global MASTER
+    MASTER = master_sid
+
+def is_master(sid):
+    return MASTER == sid
+
+def flush():
+    global UI_STATE
+    global MASTER
+    UI_STATE = dict()
+    MASTER = None
 @socketio.on('connect', namespace='/ui_state')
 def connect():
     pass
