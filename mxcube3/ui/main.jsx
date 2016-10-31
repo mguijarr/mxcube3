@@ -78,11 +78,12 @@ export default class App extends React.Component {
                          'form', 'login', 'general', 'logger', 'points'],
              storage: new ServerStorage(this.serverIO) },
              () => {
+               this.serverIO.listen();
                this.setState({ initialized: true });
              }
     );
 
-    this.serverIO.listen(persistor);
+    this.serverIO.connectStateSocket(persistor);
 
     crosstabSync(persistor);
   }

@@ -43,16 +43,19 @@ export default class ServerIO {
     };
   }
 
-  listen(statePersistor) {
+  connectStateSocket(statePersistor) {
     this.uiStateSocket = io.connect(`http://${document.domain}:${location.port}/ui_state`);
-
-    this.hwrSocket = io.connect(`http://${document.domain}:${location.port}/hwr`);
-
-    this.loggingSocket = io.connect(`http://${document.domain}:${location.port}/logging`);
 
     this.uiStateSocket.on('state_update', (newState) => {
       statePersistor.rehydrate(JSON.parse(newState));
     });
+  }
+
+  listen() {
+    this.hwrSocket = io.connect(`http://${document.domain}:${location.port}/hwr`);
+    window.hwrSocket = this.hwrSocket;
+
+    this.loggingSocket = io.connect(`http://${document.domain}:${location.port}/logging`);
 
     this.loggingSocket.on('log_record', (record) => {
       this.dispatch(addLogRecord(record));
