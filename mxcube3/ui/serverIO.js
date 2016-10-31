@@ -94,7 +94,11 @@ export default class ServerIO {
       this.dispatch(addTaskAction(record));
     });
 
-    this.hwrSocket.on('queue', (record) => {
+    this.hwrSocket.on('queue', (record, callback) => {
+      console.log("queue, record"+record+', callback='+callback);
+      if (callback) {
+          callback();
+      }
       this.dispatch(setStatus(record.Signal));
     });
 
