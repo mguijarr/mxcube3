@@ -4,6 +4,7 @@ from mxcube3 import socketio
 from mxcube3 import app as mxcube
 from mxcube3.routes import Utils
 from mxcube3.routes import qutils
+from mxcube3 import state_storage
 from sample_changer.GenericSampleChanger import SampleChangerState
 
 
@@ -170,7 +171,7 @@ def queue_execution_finished(entry):
            'Message': 'Queue execution stopped',
            'State': 1}
 
-    socketio.emit('queue', msg, namespace='/hwr')
+    state_storage.safe_emit_to_master('queue', msg, namespace='/hwr', key='QueueStopped')
 
 
 def queue_execution_failed(entry):    

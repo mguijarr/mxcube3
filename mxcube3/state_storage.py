@@ -1,10 +1,15 @@
 from flask import request
 from flask.ext.socketio import emit, join_room, leave_room
 from mxcube3 import socketio
+import functools
 import json
+import uuid
+from collections import OrderedDict
 
 MASTER = None
+SOCKETIO_MASTER_ID = None
 UI_STATE = dict()
+PENDING_EVENTS = OrderedDict()
 
 def set_master(master_sid):
     global MASTER
@@ -16,8 +21,31 @@ def is_master(sid):
 def flush():
     global UI_STATE
     global MASTER
+    global PENDING_EVENTS
     UI_STATE = dict()
     MASTER = None
+    PENDING_EVENTS = OrderedDict()
+
+def emit_pending_events():
+    print 'PENDING EVENTS', PENDING_EVENTS
+    for key, event_data in PENDING_EVENTS.items():
+        event, json_dict, kwargs = event_data
+        kwargs['key'] = key
+        safe_emit_to_master(event, json_dict, **kwargs)
+
+def _event_callback(event_key, event, json_dict, kwargs):
+    print event_key, 'RECEIVED OK'
+    PENDING_EVENTS.pop(event_key, None)
+
+def safe_emit_to_master(event, json_dict, **kwargs):
+    event_key = kwargs.pop('key', uuid.uuid4())
+    kwargs_copy = dict(kwargs)
+    kwargs['callback'] = functools.partial(_event_callback, event_key, event, json_dict, kwargs_copy)
+    kwargs['room'] = SOCKETIO_MASTER_ID
+    PENDING_EVENTS[event_key] = (event, json_dict, kwargs_copy)
+    print 'EMITTING', event, json_dict, kwargs
+    socketio.emit(event, json_dict, **kwargs)
+
 @socketio.on('connect', namespace='/ui_state')
 def connect():
     pass
