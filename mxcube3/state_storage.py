@@ -46,6 +46,13 @@ def safe_emit_to_master(event, json_dict, **kwargs):
     print 'EMITTING', event, json_dict, kwargs
     socketio.emit(event, json_dict, **kwargs)
 
+@socketio.on("setRaMaster", namespace="/hwr")
+def set_master_id():
+    global SOCKETIO_MASTER_ID
+    print 'SETTING SOCKETIO MASTER ID TO',request.sid
+    SOCKETIO_MASTER_ID = request.sid
+    emit_pending_events()
+    
 @socketio.on('connect', namespace='/ui_state')
 def connect():
     pass
