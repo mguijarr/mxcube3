@@ -23,7 +23,7 @@ def login():
     content = request.get_json()
     loginID = content['proposal']
     if LOGGED_IN_USER is not None and LOGGED_IN_USER != loginID:
-        return make_response({ "code": "", "msg": "Another user is already logged in" }, 409)
+        return make_response(jsonify({ "code": "", "msg": "Another user is already logged in" }), 409)
 
     password = content['password']
 
