@@ -5,6 +5,8 @@ from mxcube3.routes import Utils
 
 import copy
 import logging
+import time
+import gevent
 import gevent.event
 import os
 import json
@@ -15,6 +17,20 @@ import cStringIO
 SAMPLE_IMAGE = None
 CLICK_COUNT = 0
 
+def RateLimited(maxPerSecond):
+    minInterval = 1.0 / float(maxPerSecond)
+    def decorate(func):
+        lastTimeCalled = [0.0]
+        def rateLimitedFunction(*args,**kargs):
+            elapsed = time.time() - lastTimeCalled[0]
+            leftToWait = minInterval - elapsed
+            if leftToWait>0:
+                gevent.sleep(leftToWait)
+            ret = func(*args,**kargs)
+            lastTimeCalled[0] = time.time()
+            return ret
+        return rateLimitedFunction
+    return decorate
 
 def init_signals():
     """
@@ -33,9 +49,13 @@ def init_signals():
         else:
             pass
     for motor in mxcube.diffractometer.centring_motors_list:
+        @RateLimited(3)
+        def pos_cb(pos, motor=motor.lower(), **kw):
+          signals.motor_position_callback(motor, pos)
+        setattr(mxcube.diffractometer, "_%s_pos_callback" % motor, pos_cb)
         mxcube.diffractometer.connect(mxcube.diffractometer.getObjectByRole(motor.lower()),
                                       "positionChanged",
-                                      signals.motor_event_callback)
+                                      pos_cb)
         mxcube.diffractometer.connect(mxcube.diffractometer.getObjectByRole(motor.lower()),
                                       "stateChanged",
                                       signals.motor_event_callback)
