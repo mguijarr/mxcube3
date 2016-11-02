@@ -4,7 +4,7 @@ from flask import session, request, jsonify, make_response
 from mxcube3 import app as mxcube
 from mxcube3.routes import qutils
 from mxcube3.routes import limsutils
-from mxcube3 import state_storage
+from mxcube3 import remote_access, state_storage
 
 LOGGED_IN_USER = None
 
@@ -32,8 +32,8 @@ def login():
     if loginRes['status']['code'] == 'ok':
         session['loginInfo'] = { 'loginID': loginID, 'password': password, 'loginRes': loginRes }
         LOGGED_IN_USER = loginID
-        if not state_storage.MASTER:
-            state_storage.set_master(session.sid)
+        if not remote_access.MASTER:
+            remote_access.set_master(session.sid)
 
     return make_response(loginRes['status']['code'], 200)
 
@@ -46,8 +46,9 @@ def signout():
     global LOGGED_IN_USER
 
     LOGGED_IN_USER = None
-    if state_storage.is_master(session.sid):
+    if remote_access.is_master(session.sid):
         state_storage.flush()
+        remote_access.flush()
         
     session.clear()
     return make_response("", 200)
@@ -71,8 +72,8 @@ def loginInfo():
         # auto log in
         loginInfo["loginRes"] = limsutils.lims_login(loginID, loginInfo["password"])
         LOGGED_IN_USER = loginID
-        if not state_storage.MASTER:
-            state_storage.set_master(session.sid)
+        if not remote_access.MASTER:
+            remote_access.set_master(session.sid)
         session['loginInfo'] = loginInfo
 
     print 'SESSION SID =', session.sid  
@@ -86,6 +87,6 @@ def loginInfo():
                       "loginType": mxcube.db_connection.loginType.title(),
                       "loginRes": limsutils.convert_to_dict(loginInfo["loginRes"] if loginInfo is not None else {}),
                       "queue": qutils.queue_to_dict(),
-                      "master": state_storage.is_master(session.sid)
+                      "master": remote_access.is_master(session.sid)
                     }
                   )

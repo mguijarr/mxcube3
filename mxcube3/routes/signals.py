@@ -4,7 +4,7 @@ from mxcube3 import socketio
 from mxcube3 import app as mxcube
 from mxcube3.routes import Utils
 from mxcube3.routes import qutils
-from mxcube3 import state_storage
+from mxcube3.remote_access import safe_emit
 from sample_changer.GenericSampleChanger import SampleChangerState
 
 
@@ -163,7 +163,7 @@ def queue_execution_started(entry):
            'Message': 'Queue execution started',
            'State': 1}
 
-    socketio.emit('queue', msg, namespace='/hwr')
+    safe_emit('queue', msg, namespace='/hwr')
 
 
 def queue_execution_finished(entry):
@@ -171,7 +171,7 @@ def queue_execution_finished(entry):
            'Message': 'Queue execution stopped',
            'State': 1}
 
-    state_storage.safe_emit_to_master('queue', msg, namespace='/hwr', key='QueueStopped')
+    safe_emit('queue', msg, namespace='/hwr')
 
 
 def queue_execution_failed(entry):    
@@ -179,7 +179,7 @@ def queue_execution_failed(entry):
            'Message': 'Queue execution stopped',
            'State': 2}
 
-    socketio.emit('queue', msg, namespace='/hwr')
+    safe_emit('queue', msg, namespace='/hwr')
 
 
 def collect_oscillation_started(*args):
@@ -192,7 +192,7 @@ def collect_oscillation_started(*args):
 
     logging.getLogger('HWR').debug('[TASK CALLBACK] ' + str(msg))
     try:
-        socketio.emit('task', msg, namespace='/hwr')
+        safe_emit('task', msg, namespace='/hwr')
     except Exception:
         logging.getLogger("HWR").error('error sending message: ' + str(msg))
 
@@ -207,7 +207,7 @@ def collect_oscillation_failed(owner, status, state, lims_id, osc_id, params):
            'progress': 100}
     logging.getLogger('HWR').debug('[TASK CALLBACK]   ' + str(msg))
     try:
-        socketio.emit('task', msg, namespace='/hwr')
+        safe_emit('task', msg, namespace='/hwr')
     except Exception:
         logging.getLogger("HWR").error('error sending message: ' + str(msg))
 
@@ -224,7 +224,7 @@ def collect_oscillation_finished(owner, status, state, lims_id, osc_id, params):
            'progress': 100}
     logging.getLogger('HWR').debug('[TASK CALLBACK] ' + str(msg))
     try:
-        socketio.emit('task', msg, namespace='/hwr')
+        safe_emit('task', msg, namespace='/hwr')
     except Exception:
         logging.getLogger("HWR").error('error sending message: ' + str(msg))
 
@@ -240,7 +240,7 @@ def collect_ended(owner, success, message):
            'progress': 100}
     logging.getLogger('HWR').debug('[TASK CALLBACK] ' + str(msg))
     try:
-        socketio.emit('task', msg, namespace='/hwr')
+        safe_emit('task', msg, namespace='/hwr')
     except Exception:
         logging.getLogger("HWR").error('error sending message: ' + str(msg))
 
@@ -258,7 +258,7 @@ def task_event_callback(*args, **kwargs):
            'progress': get_signal_progress(kwargs['signal'])}
     logging.getLogger('HWR').debug('[TASK CALLBACK] ' + str(msg))
     try:
-        socketio.emit('task', msg, namespace='/hwr')
+        safe_emit('task', msg, namespace='/hwr')
     except Exception:
         logging.getLogger("HWR").error('error sending message: ' + str(msg))
     # try:
