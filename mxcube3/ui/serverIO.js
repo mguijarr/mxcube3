@@ -80,7 +80,11 @@ class ServerIO {
       store.dispatch(setBeamlineAttrAction(data));
     });
 
-    this.hwrSocket.on('task', (record) => {
+    this.hwrSocket.on('task', (record, callback) => {
+      if (callback) {
+        callback();
+      }
+
       const sampleDisplayData = store.getState().queue.displayData[record.sample];
       const taskCollapsed = sampleDisplayData.tasks[record.taskIndex].collapsed;
 
@@ -93,7 +97,11 @@ class ServerIO {
                                         record.progress, record.taskLimsID));
     });
 
-    this.hwrSocket.on('add_task', (record) => {
+    this.hwrSocket.on('add_task', (record, callback) => {
+      if (callback) {
+        callback();
+      }
+
       store.dispatch(addTaskAction(record));
     });
 
@@ -101,6 +109,7 @@ class ServerIO {
       if (callback) {
         callback();
       }
+
       store.dispatch(setStatus(record.Signal));
     });
 

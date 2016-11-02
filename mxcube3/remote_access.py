@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, session
 from flask.ext.socketio import emit
 from mxcube3 import socketio
 import functools
@@ -21,35 +21,44 @@ def flush():
     global MASTER
     global PENDING_EVENTS
     MASTER = None
-    PENDING_EVENTS = OrderedDict()
+    PENDING_EVENTS = deque()
 
-def _event_callback(event):
-    print event, 'RECEIVED OK'
-    PENDING_EVENTS.popleft()
+def _event_callback():
+    event_id, event, json_dict, kw = PENDING_EVENTS.popleft()
+    print 'RECEIVED ACK for',event_id
     # emit next pending event, if any
     emit_pending_events()
 
 def emit_pending_events():
     print 'pending events=',PENDING_EVENTS
     try:
-        event, json_dict, kwargs = PENDING_EVENTS[0] 
+        event_id, event, json_dict, kwargs = PENDING_EVENTS[0] 
     except IndexError:
         pass
     else:
+        print 'EMITTING',event_id
         return _emit(event, json_dict, **kwargs)
 
 def _emit(event, json_dict, **kwargs):
     kw = dict(kwargs)
-    kw['callback'] = functools.partial(_event_callback, event)
+    kw['callback'] = _event_callback
     kw['room'] = MASTER_ROOM
-    print 'EMITTING', event, json_dict, kw
     socketio.emit(event, json_dict, **kw)
 
 def safe_emit(event, json_dict, **kwargs):
-    PENDING_EVENTS.append((event, json_dict, kwargs))
-    _emit(event, json_dict, **kwargs)
+    PENDING_EVENTS.append((id(json_dict), event, json_dict, kwargs))
+    if len(PENDING_EVENTS) == 1:
+        emit_pending_events()
 
-@socketio.on("setRaMaster", namespace="/hwr")
+@socketio.on('connect', namespace='/hwr')
+def connect():
+    global MASTER_ROOM
+    print 'SETTING MASTER ROOM TO',request.sid
+    if is_master(session.sid):
+        MASTER_ROOM = request.sid
+        emit_pending_events() 
+
+@socketio.on('setRaMaster', namespace='/hwr')
 def set_master_id():
     global MASTER_ROOM
     print 'SETTING MASTER ROOM TO',request.sid

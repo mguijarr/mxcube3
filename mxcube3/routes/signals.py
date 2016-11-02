@@ -16,12 +16,6 @@ def last_queue_node():
     return qutils.node_index(node)
 
 
-@socketio.on('connect', namespace='/hwr')
-def connect():
-    # this is needed to create the namespace, and the actual connection
-    # to the server, but we don't need to do anything more
-    pass
-
 collect_signals = ['collectStarted', 'testSignal', 'warning']
 collect_osc_signals = ['collectOscillationStarted', 'collectOscillationFailed', 'collectOscillationFinished']
 beam_signals = ['beamPosChanged', 'beamInfoChanged']
