@@ -17,12 +17,9 @@ import { setStatus,
 import { setLoading } from './actions/general';
 
 
-export default class ServerIO {
+class ServerIO {
 
-  constructor(store) {
-    this.store = store;
-    this.dispatch = store.dispatch;
-
+  constructor() {
     this.hwrSocket = null;
     this.loggingSocket = null;
     this.uiStateSocket = null;
@@ -51,76 +48,81 @@ export default class ServerIO {
     });
   }
 
-  listen() {
+  setRemoteAccessMaster(cb) {
+    this.hwrSocket.emit('setRaMaster', cb);
+  }
+
+  listen(store) {
     this.hwrSocket = io.connect(`http://${document.domain}:${location.port}/hwr`);
-    window.hwrSocket = this.hwrSocket;
 
     this.loggingSocket = io.connect(`http://${document.domain}:${location.port}/logging`);
 
     this.loggingSocket.on('log_record', (record) => {
-      this.dispatch(addLogRecord(record));
+      store.dispatch(addLogRecord(record));
     });
 
     this.hwrSocket.on('Motors', (record) => {
-      this.dispatch(updatePointsPosition(record.CentredPositions));
-      this.dispatch(saveMotorPositions(record.Motors));
+      store.dispatch(updatePointsPosition(record.CentredPositions));
+      store.dispatch(saveMotorPositions(record.Motors));
       switch (record.Signal) {
         case 'minidiffPhaseChanged':
-          this.dispatch(setCurrentPhase(record.Data));
+          store.dispatch(setCurrentPhase(record.Data));
           break;
         default:
       }
     });
 
     this.hwrSocket.on('beam_changed', (record) => {
-      this.dispatch(setBeamInfo(record.Data));
+      store.dispatch(setBeamInfo(record.Data));
     });
 
     this.hwrSocket.on('beamline_value_change', (data) => {
-      this.dispatch(setBeamlineAttrAction(data));
+      store.dispatch(setBeamlineAttrAction(data));
     });
 
     this.hwrSocket.on('task', (record) => {
-      const sampleDisplayData = this.store.getState().queue.displayData[record.sample];
+      const sampleDisplayData = store.getState().queue.displayData[record.sample];
       const taskCollapsed = sampleDisplayData.tasks[record.taskIndex].collapsed;
 
       if (record.state === 1 && !taskCollapsed) {
-        this.dispatch(collapseTask(record.sample, record.taskIndex));
+        store.dispatch(collapseTask(record.sample, record.taskIndex));
       } else if (record.state === 2 && taskCollapsed) {
-        this.dispatch(collapseTask(record.sample, record.taskIndex));
+        store.dispatch(collapseTask(record.sample, record.taskIndex));
       }
-      this.dispatch(addTaskResultAction(record.sample, record.taskIndex, record.state,
+      store.dispatch(addTaskResultAction(record.sample, record.taskIndex, record.state,
                                         record.progress, record.taskLimsID));
     });
 
     this.hwrSocket.on('add_task', (record) => {
-      this.dispatch(addTaskAction(record));
+      store.dispatch(addTaskAction(record));
     });
 
     this.hwrSocket.on('queue', (record, callback) => {
-      console.log("queue, record"+record+', callback='+callback);
       if (callback) {
-          callback();
+        callback();
       }
-      this.dispatch(setStatus(record.Signal));
+      store.dispatch(setStatus(record.Signal));
     });
 
     this.hwrSocket.on('sc', (record) => {
-      this.dispatch(setLoading((record.signal === 'loadingSample' ||
+      store.dispatch(setLoading((record.signal === 'loadingSample' ||
                                 record.signal === 'loadedSample'),
                                'Loading sample',
-                               record.message, true, () => (this.dispatch(sendStopQueue()))));
+                               record.message, true, () => (store.dispatch(sendStopQueue()))));
 
       if (record.signal === 'loadReady') {
-        this.dispatch(setCurrentSample(record.location));
+        store.dispatch(setCurrentSample(record.location));
       }
     });
 
     this.hwrSocket.on('sample_centring', (record) => {
-      this.dispatch(setLoading(record.signal === 'SampleCentringRequest',
+      store.dispatch(setLoading(record.signal === 'SampleCentringRequest',
                               'Center sample',
                                record.message, false));
-      this.dispatch(startClickCentring());
+      store.dispatch(startClickCentring());
     });
   }
 }
+
+export const serverIO = new ServerIO();
+
