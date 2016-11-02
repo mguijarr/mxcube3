@@ -1,9 +1,5 @@
 from flask import request, session
-from flask.ext.socketio import emit
 from mxcube3 import socketio
-import functools
-import uuid
-#from collections import OrderedDict
 from collections import deque
 
 MASTER = None
