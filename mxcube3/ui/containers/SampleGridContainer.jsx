@@ -17,6 +17,9 @@ import {
 } from 'react-bootstrap';
 
 import {
+  setManualMount,
+  sendGetSampleList,
+  sendSyncSamples,
   filterAction,
   toggleMovableAction,
   selectAction,
@@ -25,9 +28,6 @@ import {
 } from '../actions/SamplesGrid';
 
 import {
-  sendGetSampleList,
-  sendSyncSamples,
-  setManualMount,
   setSampleOrderAction,
   deleteTask,
   deleteSample,
@@ -61,7 +61,6 @@ class SampleGridContainer extends React.Component {
     this.removeAllSamples = this.removeAllSamples.bind(this);
     this.selectAllSamples = this.selectAllSamples.bind(this);
     this.clearSelectedSamples = this.clearSelectedSamples.bind(this);
-    this.showAddSampleForm = this.props.showTaskParametersForm.bind(this, 'AddSample');
     this.showCharacterisationForm = this.handleSubmit.bind(this, 'Characterisation');
     this.showDataCollectionForm = this.handleSubmit.bind(this, 'DataCollection');
     this.onClick = this.onClick.bind(this);
@@ -492,9 +491,9 @@ function mapStateToProps(state) {
     queueGUI: state.queueGUI,
     selected: state.sampleGrid.selected,
     moving: state.sampleGrid.moving,
-    sampleList: state.queue.sampleList,
+    sampleList: state.sampleGrid.sampleList,
     defaultParameters: state.taskForm.defaultParameters,
-    manualMount: state.queue.manualMount.set,
+    manualMount: state.sampleGrid.manualMount,
     filterText: state.sampleGrid.filterText,
     order: state.sampleGrid.order,
     sampleGridContextMenu: state.sampleGrid.contextMenu

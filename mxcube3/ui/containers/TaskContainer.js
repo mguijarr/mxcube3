@@ -88,7 +88,7 @@ class TaskContainer extends React.Component {
           hide={this.props.hideTaskParametersForm}
           show={this.props.showForm === 'AddSample'}
           add={this.addSample}
-          id={this.props.manualMountID}
+          id={1}
         />
       </div>
     );
@@ -105,7 +105,6 @@ function mapStateToProps(state) {
     taskData: state.taskForm.taskData,
     sampleIds: state.taskForm.sampleIds,
     pointId: state.taskForm.pointId,
-    manualMountID: state.queue.manualMount.id,
     apertureList: state.sampleview.apertureList,
     path: state.queue.rootPath,
     lines: state.sampleview.lines

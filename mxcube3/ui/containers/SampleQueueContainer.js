@@ -25,10 +25,8 @@ function mapStateToProps(state) {
     queue: state.queue.queue,
     checked: state.queue.checked,
     select_all: state.queue.selectAll,
-    mounted: state.queue.manualMount.set,
     rootPath: state.queue.rootPath,
     displayData: state.queueGUI.displayData,
-    manualMount: state.queue.manualMount,
     loading: state.queueGUI.loading,
     userMessages: state.general.userMessages
   };
@@ -69,7 +67,6 @@ export default class SampleQueueContainer extends React.Component {
       queueStatus,
       rootPath,
       displayData,
-      manualMount,
       visibleList,
       loading
     } = this.props;
@@ -134,7 +131,6 @@ export default class SampleQueueContainer extends React.Component {
                   rootPath={rootPath}
                   collapseTask={collapseTask}
                   displayData={displayData}
-                  manualMount={manualMount}
                   mount={sendMountSample}
                   todoList={todo}
                   moveTask={moveTask}
