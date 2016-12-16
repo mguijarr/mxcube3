@@ -16,7 +16,9 @@ const INITIAL_STATE = { selected: {},
                         order: {},
                         moving: {},
                         contextMenu: {},
-                        filterText: '' };
+                        filterText: '',
+                        sampleList: {},
+                        manualMount: false };
 
 /**
  * Calculates the inital grid display order from a set of samples
@@ -61,6 +63,9 @@ function sampleOrder(order) {
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case 'SET_MANUAL_MOUNT': {
+      return Object.assign({}, state, { manualMount: action.manual });
+    }
     // Sets the list of samples (sampleList), clearing any existing list
     // Sets only the initial display order of samples in grid for this reducer
     case 'SET_SAMPLE_LIST': {
@@ -75,6 +80,36 @@ export default (state = INITIAL_STATE, action) => {
     // Set display order of samples in grid
     case 'SET_SAMPLE_ORDER': {
       return Object.assign({}, state, { order: action.order });
+    }
+    case 'SET_SAMPLES_INFO': {
+      const sampleList = {};
+      Object.keys(state.sampleList).forEach(key => {
+        const sample = state.sampleList[key];
+        let sampleInfo;
+        for (sampleInfo of action.sampleInfoList) {
+          if (sampleInfo.code) {
+            // find sample with data matrix code
+            if (sample.code === sampleInfo.code) {
+              sampleList[key] = Object.assign({}, sample, { ...sampleInfo });
+              break;
+            }
+          } else {
+            // check with sample changer location
+            const containerLocation = sampleInfo.containerSampleChangerLocation;
+            const sampleLocation = sampleInfo.sampleLocation;
+            const limsLocation = `${containerLocation}:${sampleLocation}`;
+
+            if (sample.location === limsLocation) {
+              sampleList[key] = Object.assign({}, sample, { ...sampleInfo });
+              break;
+            }
+          }
+        }
+        if (sampleList[key] === undefined) {
+          sampleList[key] = Object.assign({}, sample, { });
+        }
+      });
+      return Object.assign({}, state, { sampleList });
     }
     // Toggles a samples movable flag
     case 'TOGGLE_MOVABLE_SAMPLE': {

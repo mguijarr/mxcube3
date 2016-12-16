@@ -11,8 +11,6 @@ const initialState = {
   searchString: '',
   queueStatus: 'QueueStopped',
   showResumeQueueDialog: false,
-  sampleList: {},
-  manualMount: { set: false, id: 1 },
   visibleList: 'current'
 };
 
@@ -20,17 +18,6 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case 'SET_QUEUE': {
       return Object.assign({}, state, { queue: action.queue });
-    }
-    case 'SET_SAMPLE_LIST': {
-      return Object.assign({}, state, { sampleList: action.sampleList });
-    }
-    case 'APPEND_TO_SAMPLE_LIST': {
-      const sampleList = { ...state.sampleList, [action.sampleData.sampleID]: action.sampleData };
-      const manualMount = { ...state.manualMount };
-      if (state.manualMount.set) {
-          manualMount.id = state.manualMount.id + 1;
-      }
-      return Object.assign({}, state, { sampleList, manualMount });
     }
     case 'SET_SAMPLE_ORDER': {
       const sortedOrder = invert(action.order);
@@ -44,37 +31,6 @@ export default (state = initialState, action) => {
 
       return Object.assign({}, state, { sampleOrder });
     }
-    case 'SET_SAMPLES_INFO': {
-      const sampleList = {};
-      Object.keys(state.sampleList).forEach(key => {
-        const sample = state.sampleList[key];
-        let sampleInfo;
-        for (sampleInfo of action.sampleInfoList) {
-          if (sampleInfo.code) {
-            // find sample with data matrix code
-            if (sample.code === sampleInfo.code) {
-              sampleList[key] = Object.assign({}, sample, { ...sampleInfo });
-              break;
-            }
-          } else {
-            // check with sample changer location
-            const containerLocation = sampleInfo.containerSampleChangerLocation;
-            const sampleLocation = sampleInfo.sampleLocation;
-            const limsLocation = `${containerLocation}:${sampleLocation}`;
-
-            if (sample.location === limsLocation) {
-              sampleList[key] = Object.assign({}, sample, { ...sampleInfo });
-              break;
-            }
-          }
-        }
-        if (sampleList[key] === undefined) {
-          sampleList[key] = Object.assign({}, sample, { });
-        }
-      });
-      return Object.assign({}, state, { sampleList });
-    }
-
     case 'ADD_TASK_RESULT': {
       const queue = {
         ...state.queue,
@@ -96,10 +52,6 @@ export default (state = initialState, action) => {
       const current = { ...state.current, node: action.sampleID };
 
       return Object.assign({}, state, { queue, current });
-    }
-    case 'SET_MANUAL_MOUNT': {
-      const data = { manualMount: { ...state.manualMount, set: action.manual } };
-      return Object.assign({}, state, data);
     }
     case 'CLEAR_QUEUE': {
       return Object.assign({}, state, { queue: {} });
@@ -246,8 +198,7 @@ export default (state = initialState, action) => {
       return state;
     case 'CLEAR_ALL':
       {
-        return Object.assign({}, state, { ...initialState,
-                                          manualMount: { set: state.manualMount.set, id: 1 } });
+        return Object.assign({}, state, { ...initialState });
       }
     case 'SHOW_RESUME_QUEUE_DIALOG':
       {
@@ -263,10 +214,6 @@ export default (state = initialState, action) => {
           ...state,
           sampleList: action.data.queue.sample_list,
           rootPath: action.data.rootPath,
-          manualMount: {
-            set: !action.data.useSC,
-            id: action.data.queue.todo.length + action.data.queue.history.length + 1
-          },
           queue: action.data.queue.queue,
           todo: without(action.data.queue.todo, action.data.queue.loaded),
           history: without(action.data.queue.history, action.data.queue.loaded),
