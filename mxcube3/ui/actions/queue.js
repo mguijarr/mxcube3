@@ -3,27 +3,8 @@ import { setLoading, showErrorPanel } from './general';
 import { showTaskForm } from './taskForm';
 import { sendAbortCentring } from './sampleview';
 
-export function setSampleListAction(sampleList) {
-  return { type: 'SET_SAMPLE_LIST', sampleList };
-}
-
 export function queueLoading(loading) {
   return { type: 'QUEUE_LOADING', loading };
-}
-
-export function sendGetSampleList() {
-  return function (dispatch) {
-    dispatch(setLoading(true, 'Please wait', 'Retrieving sample changer contents', true));
-    fetch('mxcube/api/v0.1/sample_changer/samples_list', { credentials: 'include' })
-                        .then(response => response.json())
-                        .then(json => {
-                          dispatch(setLoading(false));
-                          dispatch(setSampleListAction(json));
-                        }, () => {
-                          dispatch(setLoading(false));
-                          dispatch(showErrorPanel(true, 'Could not get samples list'));
-                        });
-  };
 }
 
 
@@ -54,36 +35,8 @@ export function sendClearQueue() {
 }
 
 
-export function setManualMountAction(manual) {
-  return { type: 'SET_MANUAL_MOUNT', manual };
-}
-
-
-export function setManualMount(manual) {
-  return function (dispatch) {
-    dispatch(setManualMountAction(manual));
-    if (manual) {
-      dispatch(showTaskForm('AddSample'));
-    }
-  }
-        dispatch(sendClearQueue());
-        dispatch(setSampleListAction({}));
-}
-
-
 export function setSamplesInfoAction(sampleInfoList) {
   return { type: 'SET_SAMPLES_INFO', sampleInfoList };
-}
-
-
-export function sendSyncSamples(proposalId) {
-  return function (dispatch) {
-    fetch(`mxcube/api/v0.1/lims/samples/${proposalId}`, { credentials: 'include' })
-            .then(response => response.json())
-            .then(json => {
-              dispatch(setSamplesInfoAction(json.samples_info));
-            });
-  };
 }
 
 

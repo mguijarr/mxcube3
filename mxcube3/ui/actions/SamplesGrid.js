@@ -1,4 +1,35 @@
 import fetch from 'isomorphic-fetch';
+import { sendClearQueue } from './queue';
+import { setLoading, showErrorPanel } from './general';
+
+export function setSampleList(sampleList) {
+  return { type: 'SET_SAMPLE_LIST', sampleList };
+}
+
+export function setManualMount(manual) {
+  return function (dispatch) {
+    dispatch({ type:'SET_MANUAL_MOUNT', manual });
+    if (manual) {
+      dispatch(sendClearQueue());
+      dispatch(setSampleList({ "Manual": { code: "Manual", "defaultPrefix": "", "location":"Manual", sampleID:"1", sampleName:"", "type":"Sample" } }));
+    }
+  }
+}
+
+export function sendGetSampleList() {
+  return function (dispatch) {
+    dispatch(setLoading(true, 'Please wait', 'Retrieving sample changer contents', true));
+    fetch('mxcube/api/v0.1/sample_changer/samples_list', { credentials: 'include' })
+                        .then(response => response.json())
+                        .then(json => {
+                          dispatch(setLoading(false));
+                          dispatch(setSampleList(json));
+                        }, () => {
+                          dispatch(setLoading(false));
+                          dispatch(showErrorPanel(true, 'Could not get samples list'));
+                        });
+  };
+}
 
 
 export function selectAction(keys, selected = true) {
