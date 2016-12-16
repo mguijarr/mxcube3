@@ -250,7 +250,7 @@ class SampleGridContainer extends React.Component {
 
 
   collectButton() {
-    const collectText = this.props.queue.manualMount.set ? 'Collect' :
+    const collectText = this.props.manualMount ? 'Collect' :
                         `Collect Queue ${this.numSamplesPicked()}/${this.numSamples()}`;
 
     let button = (
@@ -283,7 +283,7 @@ class SampleGridContainer extends React.Component {
           <SplitButton
             bsStyle="primary"
             title={this.props.manualMount ? 'Manual Mount' : 'Check sample changer contents'}
-            onClick={this.props.manualMount ? this.showAddSampleForm : this.props.getSamples}
+            onClick={this.props.manualMount ? "" : this.props.getSamples}
             onSelect={this.manualMount}
             id="split-button-sample-changer-selection"
           >
