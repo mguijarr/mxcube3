@@ -398,19 +398,6 @@ export function addSamples(sampleData) {
   };
 }
 
-export function addSample(sampleData) {
-  return function (dispatch, getState) {
-    const data = { ...sampleData, checked: true, tasks: [] };
-    const { queue } = getState();
-    sendAddQueueItem([data]);
-    dispatch(addSampleAction(data));
-    if (queue.manualMount.set) {
-      dispatch(sendMountSample(data.sampleID));
-    }
-  };
-}
-
-
 export function deleteSample(sampleID) {
   return function (dispatch) {
     dispatch(queueLoading(true));
