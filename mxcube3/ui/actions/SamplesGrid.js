@@ -1,19 +1,12 @@
 import fetch from 'isomorphic-fetch';
-import { sendClearQueue } from './queue';
 import { setLoading, showErrorPanel } from './general';
 
 export function setSampleList(sampleList) {
   return { type: 'SET_SAMPLE_LIST', sampleList };
 }
 
-export function setManualMount(manual) {
-  return function (dispatch) {
-    dispatch({ type:'SET_MANUAL_MOUNT', manual });
-    if (manual) {
-      dispatch(sendClearQueue());
-      dispatch(setSampleList({ "Manual": { code: "Manual", "defaultPrefix": "", "location":"Manual", sampleID:"1", sampleName:"", "type":"Sample" } }));
-    }
-  }
+export function addSamplesToList(samplesData) {
+  return { type: 'ADD_SAMPLES_TO_LIST', samplesData }
 }
 
 export function sendGetSampleList() {
@@ -29,6 +22,10 @@ export function sendGetSampleList() {
                           dispatch(showErrorPanel(true, 'Could not get samples list'));
                         });
   };
+}
+
+export function setSampleOrderAction(order) {
+  return { type: 'SET_SAMPLE_ORDER', order };
 }
 
 

@@ -17,7 +17,6 @@ import {
 } from 'react-bootstrap';
 
 import {
-  setManualMount,
   sendGetSampleList,
   sendSyncSamples,
   filterAction,
@@ -28,13 +27,16 @@ import {
 } from '../actions/SamplesGrid';
 
 import {
-  setSampleOrderAction,
   deleteTask,
-  deleteSample,
   sendClearQueue,
-  addSample,
-  addSamples
+  //TODO: deleteSamples
+  deleteSampleFromQueue,
+  addSamplesToQueue
 } from '../actions/queue';
+
+import {
+  setSampleOrderAction,
+} from '../actions/SamplesGrid';
 
 import { showTaskForm } from '../actions/taskForm';
 import SampleGrid from '../components/SampleGrid/SampleGrid';
@@ -51,7 +53,6 @@ class SampleGridContainer extends React.Component {
     super(props);
     this.syncSamples = this.syncSamples.bind(this);
 
-    this.manualMount = this.manualMount.bind(this);
     this.filterSampleGrid = this.filterSampleGrid.bind(this);
     this.filterSampleGridClear = this.filterSampleGridClear.bind(this);
     this.filterSampleGridPicked = this.filterSampleGridPicked.bind(this);
@@ -210,12 +211,12 @@ class SampleGridContainer extends React.Component {
     const samples = [];
     for (const sampleID in this.props.selected) {
       if (this.picked(sampleID)) {
-        this.props.deleteSample(sampleID);
+        this.props.deleteSampleFromQueue(sampleID);
       } else {
         samples.push({...this.props.sampleList[sampleID], checked: true, tasks: []});
       }
     }
-    if (samples.length > 0) { this.props.addSamples(samples) };
+    if (samples.length > 0) { this.props.addSamplesToQueue(samples) };
   }
 
 
@@ -224,14 +225,14 @@ class SampleGridContainer extends React.Component {
     for (const sampleID of Object.keys(this.props.selected)) {
       samples.push({ ...this.props.sampleList[sampleID], checked: true, tasks: [] });
     }
-    this.props.addSamples(samples);
+    this.props.addSamplesToQueue(samples);
   }
 
 
   removeSelectedSamples() {
     for (const sampleID of Object.keys(this.props.selected)) {
       if (this.picked(sampleID)) {
-        this.props.deleteSample(sampleID);
+        this.props.deleteSampleFromQueue(sampleID);
       }
     }
   }
@@ -239,7 +240,7 @@ class SampleGridContainer extends React.Component {
 
   removeAllSamples() {
     for (const sampleID of Object.keys(this.props.queue.queue)) {
-      this.props.deleteSample(sampleID);
+      this.props.deleteSampleFromQueue(sampleID);
     }
   }
 
@@ -506,15 +507,15 @@ function mapDispatchToProps(dispatch) {
     setSampleOrderAction: (order) => dispatch(setSampleOrderAction(order)),
     filter: (filterText) => dispatch(filterAction(filterText)),
     syncSamples: (proposalId) => dispatch(sendSyncSamples(proposalId)),
-    setManualMount: (manual) => dispatch(setManualMount(manual)),
+    //setManualMount: (manual) => dispatch(setManualMount(manual)),
     showTaskParametersForm: bindActionCreators(showTaskForm, dispatch),
     deleteTask: bindActionCreators(deleteTask, dispatch),
     toggleMovableAction: (key) => dispatch(toggleMovableAction(key)),
     selectSamples: (keys, selected) => dispatch(selectAction(keys, selected)),
     toggleSelectedSample: (keys) => dispatch(toggleSelectedAction(keys)),
-    deleteSample: (sampleID) => dispatch(deleteSample(sampleID)),
+    deleteSampleFromQueue: (sampleID) => dispatch(deleteSampleFromQueue(sampleID)),
     sendClearQueue: () => dispatch(sendClearQueue()),
-    addSamples: (sampleData) => dispatch(addSamples(sampleData)),
+    addSamplesToQueue: (sampleData) => dispatch(addSamplesToQueue(sampleData)),
     showSampleGridContextMenu: bindActionCreators(showSampleGridContextMenu, dispatch),
   };
 }

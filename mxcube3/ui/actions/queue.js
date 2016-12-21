@@ -78,34 +78,10 @@ export function sendDeleteQueueItem(sid, tindex) {
 }
 
 
-export function setSampleOrderAction(newSampleOrder) {
-  return { type: 'SET_SAMPLE_ORDER', order: newSampleOrder };
-}
-
-
-export function addSampleAction(sampleData) {
-  return { type: 'ADD_SAMPLE', sampleData };
-}
-
-export function addSamplesAction(samplesData) {
-  return { type: 'ADD_SAMPLES', samplesData };
-}
-
-
-export function appendSampleListAction(sampleData) {
-  return { type: 'APPEND_TO_SAMPLE_LIST', sampleData };
-}
-
-
-export function removeSampleAction(sampleID) {
-  return { type: 'REMOVE_SAMPLE', sampleID };
-}
-
 
 export function setStatus(queueState) {
   return { type: 'SET_QUEUE_STATUS', queueState };
 }
-
 
 export function showList(listName) {
   return {
@@ -344,27 +320,6 @@ export function sendMountSample(sampleData) {
   };
 }
 
-export function addSamples(sampleData) {
-  return function (dispatch) {
-    sendAddQueueItem(sampleData);
-    dispatch(addSamplesAction(sampleData));
-  };
-}
-
-export function deleteSample(sampleID) {
-  return function (dispatch) {
-    dispatch(queueLoading(true));
-    sendDeleteQueueItem(sampleID, undefined).then((response) => {
-      if (response.status >= 400) {
-        dispatch(showErrorPanel(true, 'Server refused to delete sample'));
-      } else {
-        dispatch(removeSampleAction(sampleID));
-      }
-      dispatch(queueLoading(false));
-    });
-  };
-}
-
 
 export function sendRunSample(sampleID, taskIndex) {
   return function (dispatch) {
@@ -435,7 +390,9 @@ export function addTask(sampleIDs, parameters, runNow) {
       }
     ));
 
-    // const tasksClean = tasks.filter((tk) => (samplesToAdd.forEach((smp) => !smp.tasks[0] === tk)));
+    if (samples.length) { 
+      dispatch(addSamplesToQueue(samples));
+    }
 
     const allItems = samplesToAdd.concat(tasks);
 
@@ -532,10 +489,37 @@ export function clearQueue() {
 }
 
 
-export function addSampleManualMount(sampleData) {
+export function addSamplesToQueueAction(samplesData) {
+  return { type: 'ADD_SAMPLES_TO_QUEUE', samplesData };
+}
+
+
+export function removeSampleAction(sampleID) {
+  return { type: 'REMOVE_SAMPLE_FROM_QUEUE', sampleID };
+}
+
+
+export function addSamplesToQueue(sampleDataList) {
   return function (dispatch) {
-    dispatch(clearQueue());
-    dispatch(addSample(sampleData));
-    dispatch(appendSampleListAction(sampleData));
+    sendAddQueueItem(sampleDataList).then((response)=>{
+        if (response.status >= 400) {
+          dispatch(showErrorPanel(true, 'Server refused to add sample'));
+        } else {
+          dispatch(addSamplesToQueueAction(sampleDataList));
+        }
+    });
+  }
+}
+
+export function deleteSampleFromQueue(sampleID) {
+  return function (dispatch) {
+    sendDeleteQueueItem(sampleID, undefined).then((response) => {
+      if (response.status >= 400) {
+        dispatch(showErrorPanel(true, 'Server refused to delete sample'));
+      } else {
+        dispatch(removeSampleAction(sampleID));
+      }
+    });
   };
 }
+

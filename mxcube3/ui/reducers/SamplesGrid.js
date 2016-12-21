@@ -81,6 +81,12 @@ export default (state = INITIAL_STATE, action) => {
     case 'SET_SAMPLE_ORDER': {
       return Object.assign({}, state, { order: action.order });
     }
+    case 'ADD_SAMPLES_TO_LIST': {
+      const sampleList = {...state.sampleList};
+      const order = [...state.order];
+      action.samplesData.forEach((sampleData)=>{ sampleList[sampleData.sampleID]=sampleData; order.push(sampleData.sampleID) });
+      return Object.assign({}, state, { sampleList, order });
+    }
     case 'SET_SAMPLES_INFO': {
       const sampleList = {};
       Object.keys(state.sampleList).forEach(key => {
