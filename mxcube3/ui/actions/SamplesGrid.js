@@ -9,6 +9,7 @@ export function addSamplesToList(samplesData) {
   return { type: 'ADD_SAMPLES_TO_LIST', samplesData }
 }
 
+
 export function sendGetSampleList() {
   return function (dispatch) {
     dispatch(setLoading(true, 'Please wait', 'Retrieving sample changer contents', true));
