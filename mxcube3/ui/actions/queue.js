@@ -34,6 +34,31 @@ export function sendClearQueue() {
   };
 }
 
+function sendSetQueue(queue) {
+  return fetch('mxcube/api/v0.1/queue', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(queue)
+  });
+}
+
+export function setQueue(queueSamples, queueSamplesOrder) {
+  const queue = queueSamplesOrder.map(key=>queueSamples[key]);
+  
+  return dispatch => {
+    return sendSetQueue(queue).then(response => {
+      if (response.status >= 400) {
+        throw new Error('Server refused to set queue');
+      } else {
+        dispatch(setQueueAction(queue));         
+      }
+    })
+  }
+}
 
 export function setSamplesInfoAction(sampleInfoList) {
   return { type: 'SET_SAMPLES_INFO', sampleInfoList };
@@ -278,25 +303,6 @@ export function sendStopQueue() {
 
 export function setQueueAction(queue) {
   return { type: 'SET_QUEUE', queue };
-}
-
-
-export function sendSetQueue(queue, sampleOrder) {
-  const itemList = [];
-
-  for (const key of sampleOrder) {
-    itemList.push(queue[key]);
-  }
-
-  return fetch('mxcube/api/v0.1/queue', {
-    method: 'PUT',
-    credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-type': 'application/json'
-    },
-    body: JSON.stringify(itemList)
-  });
 }
 
 
