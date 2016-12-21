@@ -5,7 +5,6 @@ import update from 'react/lib/update';
 const initialState = {
   queue: {},
   current: { node: null, running: false },
-  sampleOrder: [],
   todo: [],
   history: [],
   searchString: '',
@@ -17,19 +16,9 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'SET_QUEUE': {
-      return Object.assign({}, state, { queue: action.queue });
-    }
-    case 'SET_SAMPLE_ORDER': {
-      const sortedOrder = invert(action.order);
-      const sampleOrder = [];
-
-      Object.values(sortedOrder).forEach((key) => {
-        if (Reflect.has(state.queue, key)) {
-          sampleOrder.push(key);
-        }
-      });
-
-      return Object.assign({}, state, { sampleOrder });
+      const queue = {};
+      action.queue.forEach(sample=>{ queue[sample.sampleID]=sample; });
+      return Object.assign({}, initialState, { queue });
     }
     case 'ADD_TASK_RESULT': {
       const queue = {
@@ -82,7 +71,6 @@ export default (state = initialState, action) => {
       return Object.assign({}, state,
         { todo: without(state.todo, action.sampleID),
           queue: omit(state.queue, action.sampleID),
-          sampleOrder: without(state.sampleOrder, action.sampleID),
         });
 
         // Adding the new task to the queue
@@ -111,9 +99,8 @@ export default (state = initialState, action) => {
                   ...state.queue[action.sampleID].tasks.slice(action.taskIndex + 1)]
         }
       };
-      const sampleOrder = without(state.order, action.sampleID);
 
-      return Object.assign({}, state, { queue, sampleOrder });
+      return Object.assign({}, state, { queue });
     }
     case 'UPDATE_TASK': {
       const queue = {
@@ -208,12 +195,10 @@ export default (state = initialState, action) => {
       {
         return {
           ...state,
-          sampleList: action.data.queue.sample_list,
           rootPath: action.data.rootPath,
           queue: action.data.queue.queue,
           todo: without(action.data.queue.todo, action.data.queue.loaded),
           history: without(action.data.queue.history, action.data.queue.loaded),
-          sampleOrder: action.data.queue.sample_order,
           current: { node: action.data.queue.loaded, running: false }
         };
       }

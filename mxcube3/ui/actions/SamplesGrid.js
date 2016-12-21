@@ -1,8 +1,8 @@
 import fetch from 'isomorphic-fetch';
 import { setLoading, showErrorPanel } from './general';
 
-export function setSampleList(sampleList) {
-  return { type: 'SET_SAMPLE_LIST', sampleList };
+export function setSampleList(sampleList, order) {
+  return { type: 'SET_SAMPLE_LIST', sampleList, order };
 }
 
 export function addSamplesToList(samplesData) {
@@ -14,9 +14,12 @@ export function sendGetSampleList() {
     dispatch(setLoading(true, 'Please wait', 'Retrieving sample changer contents', true));
     fetch('mxcube/api/v0.1/sample_changer/samples_list', { credentials: 'include' })
                         .then(response => response.json())
-                        .then(json => {
+                        .then(res => {
+                          const sampleList = res.sampleList;
+                          const sampleOrder = res.sampleOrder;
+
+                          dispatch(setSampleList(sampleList, sampleOrder));
                           dispatch(setLoading(false));
-                          dispatch(setSampleList(json));
                         }, () => {
                           dispatch(setLoading(false));
                           dispatch(showErrorPanel(true, 'Could not get samples list'));
