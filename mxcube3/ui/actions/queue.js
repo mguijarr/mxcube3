@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 import { setLoading, showErrorPanel } from './general';
 import { showTaskForm } from './taskForm';
 import { sendAbortCentring } from './sampleview';
+import { addSamples } from './SamplesGrid';
 
 export function queueLoading(loading) {
   return { type: 'QUEUE_LOADING', loading };
@@ -374,48 +375,48 @@ export function addTaskAction(tasks) {
 
 export function addTask(sampleIDs, parameters, runNow) {
   return function (dispatch, getState) {
-    const tasks = sampleIDs.map((id) => (
-                  { type: parameters.type,
-                  label: parameters.label,
-                  sampleID: id,
-                  parameters,
-                  checked: true }
-                  ));
-    dispatch(queueLoading(true));
-    const { queue } = getState();
-    const missingSamples = sampleIDs.filter((id) => !queue.queue[id]);  // the ones not in the queue
-    const samplesToAdd = missingSamples.map((sample) => (
-      {
-        type: 'Sample',
-        sampleID: sample,
-        sampleName: queue.sampleList[sample].sampleName,
-        location: queue.sampleList[sample].location,
-        proteinAcronym: '',
-        checked: true,
-        tasks: [] // TODO?:tasks.filter((tk) => tk.sampleID === sample)
+    const state = getState();  
+    const tasks = [];
+    const samples = [];
+
+    sampleIDs.forEach((sampleID) => {
+      const task = { type: parameters.type,
+                     label: parameters.label,
+                     sampleID,
+                     parameters,
+                     checked: true };
+
+      if (!state.queue.queue[sampleID]) {
+        const sample = state.sampleGrid.sampleList[sampleID];
+        sample.tasks = [task];
+        samples.push(sample);
+      } else {
+        tasks.push(task);
       }
-    ));
+    });
+
+    dispatch(queueLoading(true));
 
     if (samples.length) { 
-      dispatch(addSamplesToQueue(samples));
+      dispatch(addSamples(samples));
     }
 
-    const allItems = samplesToAdd.concat(tasks);
+    if (tasks.length) {
+        sendAddQueueItem(tasks).then((response) => {
+          if (response.status >= 400) {
+            dispatch(showErrorPanel(true, 'The task could not be added to the server'));
+          } else {
+            dispatch(addTaskAction(tasks));
+            if (runNow) {
+              const taskIndex = state.queue.queue[sampleIDs[0]].tasks.length;
+              dispatch(sendRunSample(sampleIDs[0], taskIndex));
+            }
+          }
+        });
+    }
 
-    sendAddQueueItem(allItems).then((response) => {
-      if (response.status >= 400) {
-        dispatch(showErrorPanel(true, 'The task could not be added to the server'));
-      } else {
-        dispatch(addSamplesAction(samplesToAdd));
-        dispatch(addTaskAction(tasks));
-        if (runNow) {
-          const taskIndex = queue.queue[sampleIDs][0].tasks.length;
-          dispatch(sendRunSample(sampleIDs, taskIndex));
-        }
-      }
-      dispatch(queueLoading(false));
-    });
-  };
+    dispatch(queueLoading(false));      
+  }
 }
 
 

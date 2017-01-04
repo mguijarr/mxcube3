@@ -79,7 +79,7 @@ export default (state = initialState, action) => {
 
       action.tasks.forEach((task) => {
         if (task.parameters.prefix === '') {
-          task.parameters.prefix = state.sampleList[task.sampleID].defaultPrefix;
+          task.parameters.prefix = queue[task.sampleID].defaultPrefix;
         }
         queue[task.sampleID] = {
           ...queue[task.sampleID],
