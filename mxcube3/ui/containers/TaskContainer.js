@@ -54,7 +54,7 @@ class TaskContainer extends React.Component {
       <div className="col-xs-12">
         <Characterisation
           addTask={this.addTask}
-          pointId={this.props.pointId}
+          pointID={this.props.pointID}
           taskData={this.props.taskData}
           hide={this.props.hideTaskParametersForm}
           apertureList={this.props.apertureList}
@@ -64,7 +64,7 @@ class TaskContainer extends React.Component {
 
         <DataCollection
           addTask={this.addTask}
-          pointId={this.props.pointId}
+          pointID={this.props.pointID}
           taskData={this.props.taskData}
           hide={this.props.hideTaskParametersForm}
           apertureList={this.props.apertureList}
@@ -74,7 +74,7 @@ class TaskContainer extends React.Component {
 
         <Helical
           addTask={this.addTask}
-          pointId={this.props.pointId}
+          pointID={this.props.pointID}
           sampleIds={this.props.sampleIds}
           taskData={this.props.taskData}
           hide={this.props.hideTaskParametersForm}
@@ -103,7 +103,7 @@ function mapStateToProps(state) {
     showForm: state.taskForm.showForm,
     taskData: state.taskForm.taskData,
     sampleIds: state.taskForm.sampleIds,
-    pointId: state.taskForm.pointId,
+    pointID: state.taskForm.pointID,
     apertureList: state.sampleview.apertureList,
     path: state.queue.rootPath,
     lines: state.sampleview.lines
