@@ -2,7 +2,6 @@ import React from 'react';
 import { reduxForm } from 'redux-form';
 import { Modal } from 'react-bootstrap';
 
-
 class AddSample extends React.Component {
   constructor(props) {
     super(props);
@@ -24,7 +23,7 @@ class AddSample extends React.Component {
     }
 
     this.props.add({ ...this.props.values, type: 'Sample', defaultPrefix: prefix,
-                     location: 'Manual', sampleID: this.props.id.toString() });
+                     location: 'Manual' });
     this.props.hide();
   }
 

@@ -88,7 +88,6 @@ class TaskContainer extends React.Component {
           hide={this.props.hideTaskParametersForm}
           show={this.props.showForm === 'AddSample'}
           add={this.addSampleToList}
-          id={1}
         />
       </div>
     );

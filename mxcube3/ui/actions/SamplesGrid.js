@@ -1,11 +1,22 @@
 import fetch from 'isomorphic-fetch';
 import { setLoading, showErrorPanel } from './general';
 
+let nextSampleID = 1;
+
+function getNextSampleID() {
+  return nextSampleID++;
+}
+
 export function setSampleList(sampleList, order) {
   return { type: 'SET_SAMPLE_LIST', sampleList, order };
 }
 
 export function addSamplesToList(samplesData) {
+  samplesData.forEach((sampleData) => {
+    if (! sampleData.sampleID) {
+      sampleData.sampleID = getNextSampleID();
+    } 
+  });
   return { type: 'ADD_SAMPLES_TO_LIST', samplesData }
 }
 
