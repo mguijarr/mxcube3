@@ -5,8 +5,6 @@ import update from 'react/lib/update';
 const initialState = {
   queue: {},
   current: { node: null, running: false },
-  todo: [],
-  history: [],
   searchString: '',
   queueStatus: 'QueueStopped',
   showResumeQueueDialog: false,
@@ -54,7 +52,6 @@ export default (state = initialState, action) => {
 
       return Object.assign({}, state,
         {
-          todo: [...state.todo, ...samplesID],
           queue: { ...state.queue, ...samplesData }
         }
       );
@@ -69,7 +66,7 @@ export default (state = initialState, action) => {
 
     case 'REMOVE_SAMPLE_FROM_QUEUE':
       return Object.assign({}, state,
-        { todo: without(state.todo, action.sampleID),
+        { 
           queue: omit(state.queue, action.sampleID),
         });
 
@@ -123,8 +120,6 @@ export default (state = initialState, action) => {
       return Object.assign({}, state,
         {
           current: { ...state.current, node: action.sampleID, running: false },
-          todo: without(state.todo, action.sampleID),
-          history: [...state.history, state.current.node]
         }
       );
     case 'CLEAR_CURRENT_SAMPLE':
@@ -197,8 +192,6 @@ export default (state = initialState, action) => {
           ...state,
           rootPath: action.data.rootPath,
           queue: action.data.queue.queue,
-          todo: without(action.data.queue.todo, action.data.queue.loaded),
-          history: without(action.data.queue.history, action.data.queue.loaded),
           current: { node: action.data.queue.loaded, running: false }
         };
       }

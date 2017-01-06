@@ -19,9 +19,7 @@ function mapStateToProps(state) {
     searchString: state.queue.searchString,
     current: state.queue.current,
     visibleList: state.queue.visibleList,
-    todo: state.queue.todo,
     queueStatus: state.queue.queueStatus,
-    history: state.queue.history,
     queue: state.queue.queue,
     checked: state.queue.checked,
     select_all: state.queue.selectAll,
@@ -59,9 +57,7 @@ export default class SampleQueueContainer extends React.Component {
   render() {
     const {
       checked,
-      todo,
       current,
-      history,
       queue,
       showForm,
       queueStatus,
@@ -85,6 +81,17 @@ export default class SampleQueueContainer extends React.Component {
       sendMountSample,
       moveTask
     } = this.props.queueActions;
+
+    // go through the queue, check if sample has been collected or not
+    // to make todo and history lists
+    const todo = []
+    sampleOrder.map(key => { 
+      const sample = queue[key];
+      if (sample) {
+        todo.push(sample.sampleID);
+      }
+    });
+    const history = [];
 
     return (
       <div style={ { display: 'flex', flexDirection: 'column', width: '100%' } }>
