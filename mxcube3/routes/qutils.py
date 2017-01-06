@@ -245,7 +245,6 @@ def get_queue_state():
     res = {"sample_list": sample_list,
            "loaded": loaded,
            "queue": queue,
-           "sample_order": order,
            "queueStatus": queue_exec_state()
            }
 

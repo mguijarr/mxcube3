@@ -21,6 +21,7 @@ function mapStateToProps(state) {
     visibleList: state.queue.visibleList,
     queueStatus: state.queue.queueStatus,
     queue: state.queue.queue,
+    sampleOrder: state.sampleGrid.order,
     checked: state.queue.checked,
     select_all: state.queue.selectAll,
     rootPath: state.queue.rootPath,
@@ -58,6 +59,7 @@ export default class SampleQueueContainer extends React.Component {
     const {
       checked,
       current,
+      sampleOrder,
       queue,
       showForm,
       queueStatus,
