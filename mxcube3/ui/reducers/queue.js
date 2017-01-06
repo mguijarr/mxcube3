@@ -41,6 +41,7 @@ export default (state = initialState, action) => {
       return Object.assign({}, state, { queue, current });
     }
     case 'CLEAR_QUEUE': {
+      return Object.assign({}, state, { queue: {}, todo: {} });
       return Object.assign({}, state, { queue: {} });
     }
     case 'ADD_SAMPLES_TO_QUEUE': {
