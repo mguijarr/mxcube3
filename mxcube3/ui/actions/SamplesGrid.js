@@ -12,12 +12,13 @@ export function setSampleList(sampleList, order) {
 }
 
 export function addSamplesToList(samplesData) {
-  samplesData.forEach((sampleData) => {
+  for (const sampleData of samplesData) {
     if (! sampleData.sampleID) {
       sampleData.sampleID = getNextSampleID();
-    } 
-  });
-  return { type: 'ADD_SAMPLES_TO_LIST', samplesData }
+    }
+  }
+
+  return { type: 'ADD_SAMPLES_TO_LIST', samplesData };
 }
 
 

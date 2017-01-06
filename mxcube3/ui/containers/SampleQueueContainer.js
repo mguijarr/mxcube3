@@ -86,13 +86,18 @@ export default class SampleQueueContainer extends React.Component {
 
     // go through the queue, check if sample has been collected or not
     // to make todo and history lists
-    const todo = []
-    sampleOrder.map(key => { 
+    const todo = [];
+
+    sampleOrder.map(key => {
       const sample = queue[key];
+
       if (sample) {
         todo.push(sample.sampleID);
       }
+
+      return sample;
     });
+
     const history = [];
 
     return (

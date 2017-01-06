@@ -31,9 +31,13 @@ export default (state = INITIAL_STATE, action) => {
       return Object.assign({}, state, { sampleList: action.sampleList, order: action.order });
     }
     case 'ADD_SAMPLES_TO_LIST': {
-      const sampleList = {...state.sampleList};
+      const sampleList = { ...state.sampleList };
       const order = [...state.order];
-      action.samplesData.forEach((sampleData)=>{ sampleList[sampleData.sampleID]=sampleData; order.push(sampleData.sampleID) });
+
+      action.samplesData.forEach((sampleData) => {
+        sampleList[sampleData.sampleID] = sampleData; order.push(sampleData.sampleID);
+      });
+
       return Object.assign({}, state, { sampleList, order });
     }
     case 'SET_SAMPLES_INFO': {
@@ -96,10 +100,6 @@ export default (state = INITIAL_STATE, action) => {
     }
     case 'FILTER_SAMPLE_LIST': {
       return Object.assign({}, state, { filterText: action.filterText });
-    }
-    // Set display order of samples in grid
-    case 'SET_SAMPLE_ORDER': {
-      return Object.assign({}, state, { order:action.order });
     }
     case 'SET_INITIAL_STATUS': {
       return { ...state };

@@ -1,5 +1,4 @@
-import { omit, invert } from 'lodash/object';
-import { without } from 'lodash/array';
+import { omit } from 'lodash/object';
 import update from 'react/lib/update';
 
 const initialState = {
@@ -15,7 +14,7 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case 'SET_QUEUE': {
       const queue = {};
-      action.queue.forEach(sample=>{ queue[sample.sampleID]=sample; });
+      action.queue.forEach(sample => { queue[sample.sampleID] = sample; });
       return Object.assign({}, initialState, { queue });
     }
     case 'ADD_TASK_RESULT': {
@@ -42,20 +41,15 @@ export default (state = initialState, action) => {
     }
     case 'CLEAR_QUEUE': {
       return Object.assign({}, state, { queue: {}, todo: {} });
-      return Object.assign({}, state, { queue: {} });
     }
     case 'ADD_SAMPLES_TO_QUEUE': {
-      const samplesID = action.samplesData.map((sample) => sample.sampleID);
       const samplesData = {};
+
       action.samplesData.forEach((sample) => {
         samplesData[sample.sampleID] = { ...sample, state: 0 };
       });
 
-      return Object.assign({}, state,
-        {
-          queue: { ...state.queue, ...samplesData }
-        }
-      );
+      return Object.assign({}, state, { queue: { ...state.queue, ...samplesData } });
     }
 
     // Setting state
@@ -66,22 +60,22 @@ export default (state = initialState, action) => {
       };
 
     case 'REMOVE_SAMPLE_FROM_QUEUE':
-      return Object.assign({}, state,
-        { 
-          queue: omit(state.queue, action.sampleID),
-        });
+      return Object.assign({}, state, { queue: omit(state.queue, action.sampleID) });
 
-        // Adding the new task to the queue
+    // Adding the new task to the queue
     case 'ADD_TASKS': {
       const queue = { ...state.queue };
 
-      action.tasks.forEach((task) => {
+      action.tasks.forEach((t) => {
+        const task = { ...t, state: 0 };
+
         if (task.parameters.prefix === '') {
           task.parameters.prefix = queue[task.sampleID].defaultPrefix;
         }
+
         queue[task.sampleID] = {
           ...queue[task.sampleID],
-          tasks: [...queue[task.sampleID].tasks, { ...task, state: 0 }]
+          tasks: [...queue[task.sampleID].tasks, task]
         };
       });
 

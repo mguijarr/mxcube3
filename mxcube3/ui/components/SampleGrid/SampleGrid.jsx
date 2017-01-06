@@ -40,15 +40,15 @@ export default class SampleGrid extends React.Component {
     }
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    if (!(isEqual(this.props.order, nextProps.order) && 
+  componentWillUpdate(nextProps) {
+    if (!(isEqual(this.props.order, nextProps.order) &&
           (this.props.sampleList.length === nextProps.sampleList.length))) {
       this._doReorder = true;
     }
   }
 
   componentDidUpdate() {
-    if (this._prevNVisibleSamples != this._nVisibleSamples) {
+    if (this._prevNVisibleSamples !== this._nVisibleSamples) {
       this.prevNVisibleSamples = this._nVisibleSamples;
       this._doReorder = true;
     }
@@ -221,7 +221,7 @@ export default class SampleGrid extends React.Component {
       const sampleID = samplesList[key].sampleID;
       if (this.props.queue.queue[sampleID]) {
         orderedList.push(key);
-      }  
+      }
     });
 
     this.props.order.forEach(key => {
@@ -229,7 +229,7 @@ export default class SampleGrid extends React.Component {
         const sample = samplesList[key];
         const [acronym, name, tags] = [sample.proteinAcronym, sample.sampleName, []];
         const picked = this.props.queue.queue[sample.sampleID];
-   
+
         if (picked) {
           for (const task of this.props.queue.queue[sample.sampleID].tasks) {
             tags.push(task);
@@ -243,7 +243,7 @@ export default class SampleGrid extends React.Component {
           <SampleGridItem
             key={i}
             ref={i}
-            queueOrder={orderedList.indexOf(key)+1} 
+            queueOrder={orderedList.indexOf(key) + 1}
             itemKey={key}
             sampleData={samplesList[sample.sampleID]}
             sampleID={sample.sampleID}

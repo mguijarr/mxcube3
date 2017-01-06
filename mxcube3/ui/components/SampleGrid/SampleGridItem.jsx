@@ -59,10 +59,10 @@ export class SampleGridItem extends React.Component {
       // select if the item is not already selected. This makes selection
       // feature work nicely with the context menu.
       if (e.nativeEvent.buttons === 1) {
-        this.props.dragStartSelection(this.props.itemKey); 
+        this.props.dragStartSelection(this.props.itemKey);
       } else if (e.nativeEvent.button === 2) {
         if (!this.props.selected[this.props.itemKey]) {
-          this.props.dragStartSelection(this.props.itemKey); 
+          this.props.dragStartSelection(this.props.itemKey);
         }
       }
     }
@@ -71,7 +71,7 @@ export class SampleGridItem extends React.Component {
 
   onMouseEnter(e) {
     if (e.nativeEvent.buttons === 1 || e.nativeEvent.button === 2) {
-      this.props.dragSelectItem(this.props.itemKey); 
+      this.props.dragSelectItem(this.props.itemKey);
     }
   }
 
