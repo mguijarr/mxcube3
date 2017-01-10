@@ -17,6 +17,37 @@ export function setQueueAction(queue) {
 }
 
 
+export function addSamplesToQueueAction(samplesData) {
+  return { type: 'ADD_SAMPLES_TO_QUEUE', samplesData };
+}
+
+
+export function sendAddQueueItem(items) {
+  return fetch('mxcube/api/v0.1/queue', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json',
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify(items)
+  });
+}
+
+
+export function addSamplesToQueue(sampleDataList) {
+  return function (dispatch) {
+    sendAddQueueItem(sampleDataList).then((response) => {
+      if (response.status >= 400) {
+        dispatch(showErrorPanel(true, 'Server refused to add sample'));
+      } else {
+        dispatch(addSamplesToQueueAction(sampleDataList));
+      }
+    });
+  };
+}
+
+
 export function sendClearQueue() {
   return function (dispatch) {
     fetch('mxcube/api/v0.1/queue/clear', {
@@ -70,19 +101,6 @@ export function setSamplesInfoAction(sampleInfoList) {
 }
 
 
-export function sendAddQueueItem(items) {
-  return fetch('mxcube/api/v0.1/queue', {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-type': 'application/json'
-    },
-    body: JSON.stringify(items)
-  });
-}
-
-
 export function sendUpdateQueueItem(sid, tindex, data) {
   return fetch(`mxcube/api/v0.1/queue/${sid}/${tindex}`, {
     method: 'POST',
@@ -96,14 +114,15 @@ export function sendUpdateQueueItem(sid, tindex, data) {
 }
 
 
-export function sendDeleteQueueItem(sid, tindex) {
-  return fetch(`mxcube/api/v0.1/queue/${sid}/${tindex}`, {
-    method: 'DELETE',
+export function sendDeleteQueueItem(itemPosList) {
+  return fetch('mxcube/api/v0.1/queue/delete', {
+    method: 'POST',
     credentials: 'include',
     headers: {
       Accept: 'application/json',
       'Content-type': 'application/json'
-    }
+    },
+    body: JSON.stringify(itemPosList)
   });
 }
 
@@ -111,17 +130,6 @@ export function sendDeleteQueueItem(sid, tindex) {
 export function setSampleOrderAction(newSampleOrder) {
   return { type: 'SET_SAMPLE_ORDER', order: newSampleOrder };
 }
-
-
-export function addSamplesAction(samplesData) {
-  return { type: 'ADD_SAMPLES', samplesData };
-}
-
-
-export function appendSampleListAction(sampleData) {
-  return { type: 'APPEND_TO_SAMPLE_LIST', sampleData };
-}
-
 
 export function setStatus(queueState) {
   return { type: 'SET_QUEUE_STATUS', queueState };
@@ -190,6 +198,7 @@ export function sendMoveTask(sampleID, oldIndex, newIndex) {
     }
   });
 }
+
 
 export function moveTask(sampleID, oldIndex, newIndex) {
   return function (dispatch) {
@@ -347,21 +356,6 @@ export function sendMountSample(sampleData) {
 }
 
 
-export function deleteSample(sampleID) {
-  return function (dispatch) {
-    dispatch(queueLoading(true));
-    sendDeleteQueueItem(sampleID, undefined).then((response) => {
-      if (response.status >= 400) {
-        dispatch(showErrorPanel(true, 'Server refused to delete sample'));
-      } else {
-        dispatch(removeSampleAction(sampleID));
-      }
-      dispatch(queueLoading(false));
-    });
-  };
-}
-
-
 export function sendRunSample(sampleID, taskIndex) {
   return function (dispatch) {
     fetch(`mxcube/api/v0.1/queue/${sampleID}/${taskIndex}/execute`, {
@@ -390,7 +384,7 @@ export function removeTaskAction(sampleID, taskIndex) {
 export function deleteTask(sampleID, taskIndex) {
   return function (dispatch) {
     dispatch(queueLoading(true));
-    sendDeleteQueueItem(sampleID, taskIndex).then((response) => {
+    sendDeleteQueueItem([[sampleID, taskIndex]]).then((response) => {
       if (response.status >= 400) {
         dispatch(showErrorPanel(true, 'Server refused to delete task'));
       } else {
@@ -432,7 +426,7 @@ export function addTask(sampleIDs, parameters, runNow) {
     dispatch(queueLoading(true));
 
     if (samples.length) {
-      dispatch(addSamples(samples));
+      dispatch(addSamplesToQueue(samples));
     }
 
     if (tasks.length) {
@@ -530,33 +524,23 @@ export function clearQueue() {
 }
 
 
-export function addSamplesToQueueAction(samplesData) {
-  return { type: 'ADD_SAMPLES_TO_QUEUE', samplesData };
-}
-
-
-export function addSamplesToQueue(sampleDataList) {
+export function deleteSamplesFromQueue(sampleIDList) {
   return function (dispatch) {
-    sendAddQueueItem(sampleDataList).then((response) => {
-      if (response.status >= 400) {
-        dispatch(showErrorPanel(true, 'Server refused to add sample'));
-      } else {
-        dispatch(addSamplesToQueueAction(sampleDataList));
-      }
+    dispatch(queueLoading(true));
+
+    const itemPostList = sampleIDList.map(sampleID => {
+      const itemPos = [sampleID, undefined];
+      return itemPos;
     });
-  };
-}
 
-
-export function deleteSampleFromQueue(sampleID) {
-  return function (dispatch) {
-    sendDeleteQueueItem(sampleID, undefined).then((response) => {
+    sendDeleteQueueItem(itemPostList).then((response) => {
       if (response.status >= 400) {
         dispatch(showErrorPanel(true, 'Server refused to delete sample'));
       } else {
-        dispatch(removeSampleAction(sampleID));
+        dispatch(removeSamplesFromQueueAction(sampleIDList));
       }
+
+      dispatch(queueLoading(false));
     });
   };
 }
-
