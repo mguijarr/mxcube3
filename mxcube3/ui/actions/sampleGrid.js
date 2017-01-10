@@ -79,9 +79,3 @@ export function sendSyncSamples(proposalId) {
 export function toggleMovableAction(key) {
   return { type: 'TOGGLE_MOVABLE_SAMPLE', key };
 }
-
-
-export function showSampleGridContextMenu(x, y, show) {
-  return { type: 'SAMPLE_GRID_CONTEXT_MENU', x, y, show };
-}
-

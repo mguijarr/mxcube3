@@ -22,7 +22,6 @@ import {
   toggleMovableAction,
   selectAction,
   toggleSelectedAction,
-  showSampleGridContextMenu,
   setSampleOrderAction,
 } from '../actions/sampleGrid';
 
@@ -448,7 +447,6 @@ class SampleGridContainer extends React.Component {
               select={this.props.selectSamples}
               pickSelected={this.toggleAddDeleteSelectedSamples}
               toggleSelectedSample={this.props.toggleSelectedSample}
-              showSampleGridContextMenu={this.props.showSampleGridContextMenu}
               queueGUI={this.props.queueGUI}
             />
           </div>
@@ -487,7 +485,6 @@ function mapDispatchToProps(dispatch) {
     deleteSamplesFromQueue: (sampleID) => dispatch(deleteSamplesFromQueue(sampleID)),
     sendClearQueue: () => dispatch(sendClearQueue()),
     addSamplesToQueue: (sampleData) => dispatch(addSamplesToQueue(sampleData)),
-    showSampleGridContextMenu: bindActionCreators(showSampleGridContextMenu, dispatch),
   };
 }
 
