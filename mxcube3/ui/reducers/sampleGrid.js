@@ -42,6 +42,9 @@ export default (state = INITIAL_STATE, action) => {
 
       return Object.assign({}, state, { sampleList, order });
     }
+    case 'SET_SAMPLE_ORDER': {
+      return Object.assign({}, state, { order: action.order });
+    }
     case 'SET_SAMPLES_INFO': {
       const sampleList = {};
       Object.keys(state.sampleList).forEach(key => {
@@ -105,6 +108,9 @@ export default (state = INITIAL_STATE, action) => {
     }
     case 'SET_INITIAL_STATE': {
       return { ...state };
+    }
+    case 'CLEAR_ALL': {
+      return Object.assign({}, state, { ...INITIAL_STATE });
     }
     default: {
       return state;
