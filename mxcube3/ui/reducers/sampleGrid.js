@@ -28,7 +28,9 @@ export default (state = INITIAL_STATE, action) => {
     }
     // Set the list of samples (sampleList), clearing any existing list
     case 'SET_SAMPLE_LIST': {
-      return Object.assign({}, state, { sampleList: action.sampleList, order: action.order });
+      return Object.assign({}, state, { sampleList: action.sampleList,
+					order: action.order,
+					selected: {} });
     }
     case 'ADD_SAMPLES_TO_LIST': {
       const sampleList = { ...state.sampleList };
