@@ -136,8 +136,8 @@ export function setStatus(queueState) {
 }
 
 
-export function removeSampleAction(sampleID) {
-  return { type: 'REMOVE_SAMPLE_FROM_QUEUE', sampleID };
+export function removeSamplesFromQueueAction(sampleIDList) {
+  return { type: 'REMOVE_SAMPLES_FROM_QUEUE', sampleIDList };
 }
 
 
