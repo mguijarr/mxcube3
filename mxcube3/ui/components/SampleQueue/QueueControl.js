@@ -1,7 +1,7 @@
 import React from 'react';
 import 'bootstrap';
 import './app.less';
-import { ProgressBar, Button } from 'react-bootstrap';
+import { ProgressBar, Button, Input } from 'react-bootstrap';
 
 export default class QueueControl extends React.Component {
 
@@ -47,15 +47,23 @@ export default class QueueControl extends React.Component {
     return (
       <div className="m-tree">
         <div className="list-head">
-           <div className="left">
-          {queueOptions.map((option) => this.renderOptions(option))}
-          <span className="queue-root">
+          <div className="left">
+            {queueOptions.map((option) => this.renderOptions(option))}
+            <span className="queue-root">
             Total Progress {`${historyLength}/${totalSamples - current} `}:
           </span>
           </div>
           <div className="right">
-           <ProgressBar active now={progress} />
+            <ProgressBar active now={progress} />
           </div>
+        <div style={ { marginLeft:'20px' } }>
+              <Input type="checkbox" >
+                Auto loop centring
+              </Input>
+              <Input type="checkbox">
+	        Automount next sample
+              </Input>
+            </div>
         </div>
       </div>
     );
