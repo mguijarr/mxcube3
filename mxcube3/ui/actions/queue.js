@@ -43,10 +43,29 @@ export function addSamplesToQueue(sampleDataList) {
         dispatch(showErrorPanel(true, 'Server refused to add sample'));
       } else {
         dispatch(addSamplesToQueueAction(sampleDataList));
+
+        const keys = sampleDataList.map(sampleData => { return sampleData.sampleID });
+        dispatch(selectSamplesAction(keys));
       }
     });
   };
 }
+
+
+export function addSampleAndMount(sampleData) {
+  return function (dispatch) {
+    sendAddQueueItem([sampleData]).then((response) => {
+      if (response.status >= 400) {
+        dispatch(showErrorPanel(true, 'Server refused to add sample'));
+      } else {
+        dispatch(addSamplesToQueueAction([sampleData]));
+	dispatch(selectSamplesAction([sampleData.sampleID]));
+        dispatch(sendMountSample(sampleData));
+      }
+    });
+  };
+}
+
 
 
 export function sendClearQueue() {
