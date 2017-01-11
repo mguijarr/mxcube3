@@ -27,7 +27,7 @@ export function setSampleOrderAction(order) {
 }
 
 
-export function selectAction(keys, selected = true) {
+export function selectSamplesAction(keys, selected = true) {
   return { type: 'SELECT_SAMPLES', keys, selected };
 }
 

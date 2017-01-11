@@ -14,7 +14,7 @@ import {
 } from '../actions/queue';
 
 import {
-  selectAction,
+  selectSamplesAction,
   addSamplesToList
 } from '../actions/sampleGrid';
 
@@ -114,7 +114,7 @@ function mapDispatchToProps(dispatch) {
   return {
     showTaskParametersForm: bindActionCreators(showTaskForm, dispatch),
     hideTaskParametersForm: bindActionCreators(hideTaskParametersForm, dispatch),
-    selectSamples: bindActionCreators(selectAction, dispatch),
+    selectSamples: bindActionCreators(selectSamplesAction, dispatch),
     updateTask: bindActionCreators(updateTask, dispatch),
     addTask: bindActionCreators(addTask, dispatch),
     addSamplesToList: bindActionCreators(addSamplesToList, dispatch),

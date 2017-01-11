@@ -20,7 +20,7 @@ import {
   sendSyncSamples,
   filterAction,
   toggleMovableAction,
-  selectAction,
+  selectSamplesAction,
   toggleSelectedAction,
   setSampleOrderAction,
 } from '../actions/sampleGrid';
@@ -480,7 +480,7 @@ function mapDispatchToProps(dispatch) {
     showTaskParametersForm: bindActionCreators(showTaskForm, dispatch),
     deleteTask: bindActionCreators(deleteTask, dispatch),
     toggleMovableAction: (key) => dispatch(toggleMovableAction(key)),
-    selectSamples: (keys, selected) => dispatch(selectAction(keys, selected)),
+    selectSamples: (keys, selected) => dispatch(selectSamplesAction(keys, selected)),
     toggleSelectedSample: (keys) => dispatch(toggleSelectedAction(keys)),
     deleteSamplesFromQueue: (sampleID) => dispatch(deleteSamplesFromQueue(sampleID)),
     sendClearQueue: () => dispatch(sendClearQueue()),
