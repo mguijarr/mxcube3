@@ -127,10 +127,6 @@ export function sendDeleteQueueItem(itemPosList) {
 }
 
 
-export function setSampleOrderAction(newSampleOrder) {
-  return { type: 'SET_SAMPLE_ORDER', order: newSampleOrder };
-}
-
 export function setStatus(queueState) {
   return { type: 'SET_QUEUE_STATUS', queueState };
 }
