@@ -11,12 +11,6 @@ class AddSample extends React.Component {
     this.getDefaultSampleData = this.getDefaultSampleData.bind(this);
   }
 
-
-  handleCancel() {
-    this.props.hide();
-  }
-
-  
   getDefaultSampleData() {
     let prefix = this.props.values.sampleName ? this.props.values.sampleName : 'noname';
 
@@ -31,6 +25,10 @@ class AddSample extends React.Component {
              tasks: [] };
   }
 
+  handleCancel() {
+    this.props.hide();
+  }
+
   addAndEnqueue() {
     this.props.addToQueue(this.getDefaultSampleData());
     this.props.hide();
@@ -40,7 +38,6 @@ class AddSample extends React.Component {
     this.props.addAndMount(this.getDefaultSampleData());
     this.props.hide();
   }
-
 
   render() {
     const { fields: { sampleName, proteinAcronym } } = this.props;
