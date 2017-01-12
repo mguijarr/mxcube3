@@ -22,6 +22,7 @@ class AddSample extends React.Component {
              type: 'Sample',
              defaultPrefix: prefix,
              location: 'Manual',
+             loadable: true,
              tasks: [] };
   }
 
