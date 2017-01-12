@@ -90,8 +90,7 @@ export default class SampleQueueContainer extends React.Component {
 
     sampleOrder.map(key => {
       const sample = queue[key];
-
-      if (sample) {
+      if (sample && sample.state !== 3 && sample.sampleID !== current.node) {
         todo.push(sample.sampleID);
       }
 
