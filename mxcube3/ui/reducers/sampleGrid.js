@@ -19,7 +19,7 @@ const INITIAL_STATE = { selected: {},
                         order: [],
                         moving: {},
                         contextMenu: {},
-                        filterText: ''};
+                        filterText: '' };
 
 
 export default (state = INITIAL_STATE, action) => {
