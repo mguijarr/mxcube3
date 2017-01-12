@@ -2,7 +2,7 @@ import React from 'react';
 import 'bootstrap-webpack';
 import './app.less';
 import { Button } from 'react-bootstrap';
-import { QUEUE_RUNNING } from '../../actions/queue';
+import { QUEUE_RUNNING } from '../../constants';
 
 export default class TodoTree extends React.Component {
   constructor(props) {

@@ -3,12 +3,6 @@ import { showErrorPanel } from './general';
 import { sendAbortCentring } from './sampleview';
 import { selectSamplesAction } from '../actions/sampleGrid';
 
-// QUEUE_RUNNING is not used within this file but defined here
-// for easy reuse. However eslint complains as soon as its not
-// used within the same file. So disable eslint for this line.
-
-// eslint-disable-next-line no-unused-vars
-const QUEUE_RUNNING = 'QueueStarted';
 
 export function queueLoading(loading) {
   return { type: 'QUEUE_LOADING', loading };
