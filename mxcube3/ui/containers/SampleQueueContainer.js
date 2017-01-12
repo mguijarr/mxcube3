@@ -22,6 +22,7 @@ function mapStateToProps(state) {
     visibleList: state.queue.visibleList,
     queueStatus: state.queue.queueStatus,
     queue: state.queue.queue,
+    sampleList: state.sampleGrid.sampleList,
     sampleOrder: state.sampleGrid.order,
     checked: state.queue.checked,
     rootPath: state.queue.rootPath,
@@ -61,6 +62,7 @@ export default class SampleQueueContainer extends React.Component {
       current,
       sampleOrder,
       queue,
+      sampleList,
       showForm,
       queueStatus,
       rootPath,
@@ -89,9 +91,9 @@ export default class SampleQueueContainer extends React.Component {
     const todo = [];
     const history = [];
 
-    sampleOrder.map(key => {
-      const sample = queue[key];
-      if (sample) {
+    for (const key of sampleOrder) {
+      if (queue[key]) {
+        const sample = sampleList[key];
         if (sample.state && SAMPLE_MOUNTED) {
           history.push(sample.sampleID);
         } else {
@@ -100,9 +102,7 @@ export default class SampleQueueContainer extends React.Component {
           }
         }
       }
-
-      return sample;
-    });
+    }
 
     return (
       <div style={ { display: 'flex', flexDirection: 'column', width: '100%' } }>
