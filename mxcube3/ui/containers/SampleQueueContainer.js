@@ -157,6 +157,7 @@ export default class SampleQueueContainer extends React.Component {
                   displayData={displayData}
                   mount={sendMountSample}
                   showForm={showForm}
+                  queueStatus={queueStatus}
                 />
                 <UserMessage
                   messages={this.props.userMessages}
