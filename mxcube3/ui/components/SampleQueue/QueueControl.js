@@ -56,12 +56,12 @@ export default class QueueControl extends React.Component {
           <div className="right">
             <ProgressBar active now={progress} />
           </div>
-        <div style={ { marginLeft:'20px' } }>
+        <div style={ { marginLeft: '20px' } }>
               <Input type="checkbox" >
                 Auto loop centring
               </Input>
               <Input type="checkbox">
-	        Automount next sample
+                Automount next sample
               </Input>
             </div>
         </div>
