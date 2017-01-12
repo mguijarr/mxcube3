@@ -13,6 +13,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { Nav, NavItem } from 'react-bootstrap';
 import UserMessage from '../components/Notify/UserMessage';
 import loader from '../img/loader.gif';
+import { SAMPLE_MOUNTED } from '../constants';
 
 function mapStateToProps(state) {
   return {
@@ -91,13 +92,14 @@ export default class SampleQueueContainer extends React.Component {
 
     sampleOrder.map(key => {
       const sample = queue[key];
-
-      if (sample && sample.state !== 2 && sample.sampleID !== current.node) {
-        todo.push(sample.sampleID);
-      }
-
-      if (sample && sample.state > 1) {
-	history.push(sample.sampleID);
+      if (sample) {
+        if (sample.state && SAMPLE_MOUNTED) {
+          history.push(sample.sampleID);
+        } else {
+          if (sample.sampleID !== current.node) {
+            todo.push(sample.sampleID);
+          }
+        }
       }
 
       return sample;
