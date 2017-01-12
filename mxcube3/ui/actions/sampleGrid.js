@@ -1,24 +1,30 @@
 import fetch from 'isomorphic-fetch';
 import { setLoading, showErrorPanel } from './general';
 
-let NEXT_SAMPLE_ID = 1;
-
-function getNextSampleID() {
-  return NEXT_SAMPLE_ID++;
-}
 
 export function setSampleList(sampleList, order) {
   return { type: 'SET_SAMPLE_LIST', sampleList, order };
 }
 
-export function addSamplesToList(samplesData) {
-  for (const sampleData of samplesData) {
-    if (! sampleData.sampleID) {
-      sampleData.sampleID = getNextSampleID();
-    }
-  }
 
-  return { type: 'ADD_SAMPLES_TO_LIST', samplesData };
+export function addSamplesToList(samplesData) {
+  return function (dispatch, getState) {
+    // find last manually mounted sample id
+    const sampleList = getState().sampleGrid.sampleList;
+
+    let lastSampleID = Math.max(...Object.values(sampleList).map((sampleData) =>
+      (sampleData.location === 'Manual' ? sampleData.sampleID : 0)
+    ), 0);
+
+    for (const sampleData of samplesData) {
+      if (! sampleData.sampleID) {
+        lastSampleID++;
+        sampleData.sampleID = lastSampleID;
+      }
+    }
+
+    dispatch({ type: 'ADD_SAMPLES_TO_LIST', samplesData });
+  };
 }
 
 

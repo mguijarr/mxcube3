@@ -34,9 +34,11 @@ export default (state = INITIAL_STATE, action) => {
       const sampleList = { ...state.sampleList };
       const order = [...state.order];
 
-      action.samplesData.forEach((sampleData) => {
-        sampleList[sampleData.sampleID] = sampleData; order.push(sampleData.sampleID);
-      });
+      for (const sampleData of action.samplesData) {
+        const sampleID = sampleData.sampleID;
+        sampleList[sampleID] = Object.assign({}, sampleData);
+        order.push(sampleID);
+      }
 
       return Object.assign({}, state, { sampleList, order });
     }
