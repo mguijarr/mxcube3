@@ -29,15 +29,14 @@ import {
   deleteTask,
   sendClearQueue,
   deleteSamplesFromQueue,
-  addSamplesToQueue
+  addSamplesToQueue,
+  QUEUE_RUNNING
 } from '../actions/queue';
 
 import { showTaskForm } from '../actions/taskForm';
 import SampleGrid from '../components/SampleGrid/SampleGrid';
 import { SAMPLE_ITEM_WIDTH, SAMPLE_ITEM_SPACE } from '../components/SampleGrid/SampleGridItem';
 import '../components/SampleGrid/SampleGrid.css';
-
-const QUEUE_RUNNING = 'QueueStarted';
 
 
 class SampleGridContainer extends React.Component {

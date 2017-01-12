@@ -1,7 +1,14 @@
 import fetch from 'isomorphic-fetch';
 import { showErrorPanel } from './general';
 import { sendAbortCentring } from './sampleview';
-import { selectSamplesAction  } from '../actions/sampleGrid';
+import { selectSamplesAction } from '../actions/sampleGrid';
+
+// QUEUE_RUNNING is not used within this file but defined here
+// for easy reuse. However eslint complains as soon as its not
+// used within the same file. So disable eslint for this line.
+
+// eslint-disable-next-line no-unused-vars
+const QUEUE_RUNNING = 'QueueStarted';
 
 export function queueLoading(loading) {
   return { type: 'QUEUE_LOADING', loading };
@@ -36,6 +43,34 @@ export function sendAddQueueItem(items) {
 }
 
 
+export function setCurrentSample(sampleID) {
+  return {
+    type: 'SET_CURRENT_SAMPLE', sampleID
+  };
+}
+
+
+export function sendMountSample(sampleData) {
+  return function (dispatch) {
+    fetch('mxcube/api/v0.1/sample_changer/mount', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(sampleData)
+    }).then((response) => {
+      if (response.status >= 400) {
+        throw new Error('Server refused to mount sample');
+      } else {
+        dispatch(setCurrentSample(sampleData.sampleID));
+      }
+    });
+  };
+}
+
+
 export function addSamplesToQueue(sampleDataList) {
   return function (dispatch) {
     sendAddQueueItem(sampleDataList).then((response) => {
@@ -44,7 +79,7 @@ export function addSamplesToQueue(sampleDataList) {
       } else {
         dispatch(addSamplesToQueueAction(sampleDataList));
 
-        const keys = sampleDataList.map(sampleData => { return sampleData.sampleID });
+        const keys = sampleDataList.map(sampleData => sampleData.sampleID);
         dispatch(selectSamplesAction(keys));
       }
     });
@@ -59,13 +94,12 @@ export function addSampleAndMount(sampleData) {
         dispatch(showErrorPanel(true, 'Server refused to add sample'));
       } else {
         dispatch(addSamplesToQueueAction([sampleData]));
-	dispatch(selectSamplesAction([sampleData.sampleID]));
+        dispatch(selectSamplesAction([sampleData.sampleID]));
         dispatch(sendMountSample(sampleData));
       }
     });
   };
 }
-
 
 
 export function sendClearQueue() {
@@ -237,13 +271,6 @@ export function runSample(queueID) {
 }
 
 
-export function setCurrentSample(sampleID) {
-  return {
-    type: 'SET_CURRENT_SAMPLE', sampleID
-  };
-}
-
-
 export function clearCurrentSample() {
   return {
     type: 'CLEAR_CURRENT_SAMPLE'
@@ -332,27 +359,6 @@ export function sendStopQueue() {
       dispatch(sendAbortCentring());
       if (response.status >= 400) {
         throw new Error('Server refused to stop queue');
-      }
-    });
-  };
-}
-
-
-export function sendMountSample(sampleData) {
-  return function (dispatch) {
-    fetch('mxcube/api/v0.1/sample_changer/mount', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify(sampleData)
-    }).then((response) => {
-      if (response.status >= 400) {
-        throw new Error('Server refused to mount sample');
-      } else {
-        dispatch(setCurrentSample(sampleData.sampleID));
       }
     });
   };
