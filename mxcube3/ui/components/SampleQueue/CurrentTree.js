@@ -3,7 +3,7 @@ import 'bootstrap';
 import './app.less';
 import TaskItem from './TaskItem';
 import { Button } from 'react-bootstrap';
-import { QUEUE_STOPPED, QUEUE_PAUSED, QUEUE_RUNNING } from '../../constants'
+import { QUEUE_STOPPED, QUEUE_PAUSED, QUEUE_RUNNING } from '../../constants';
 
 export default class CurrentTree extends React.Component {
 
