@@ -323,11 +323,11 @@ def _handle_sample(node):
         children_states.append(child_state)
 
     if RUNNING in children_states:
-        state = RUNNING && SAMPLE_MOUNTED
+        state = RUNNING & SAMPLE_MOUNTED
     elif 3 in children_states:
-        state = FAILED && SAMPLE_MOUNTED
+        state = FAILED & SAMPLE_MOUNTED
     elif all(i == COLLECTED for i in children_states) and len(children_states) > 0:
-        state = COLLECTED && SAMPLE_MOUNTED
+        state = COLLECTED & SAMPLE_MOUNTED
     else:
         state = UNCOLLECTED
 
