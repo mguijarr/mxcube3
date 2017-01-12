@@ -17,15 +17,11 @@ const INITIAL_STATE = { selected: {},
                         order: [],
                         moving: {},
                         contextMenu: {},
-                        filterText: '',
-                        manualMount: false };
+                        filterText: ''};
 
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case 'SET_MANUAL_MOUNT': {
-      return Object.assign({}, state, { manualMount: action.manual });
-    }
     // Set the list of samples (sampleList), clearing any existing list
     case 'SET_SAMPLE_LIST': {
       return Object.assign({}, state, { sampleList: action.sampleList,

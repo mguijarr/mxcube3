@@ -128,11 +128,6 @@ class SampleGridContainer extends React.Component {
   }
 
 
-  manualMount() {
-    this.props.setManualMount(!this.props.manualMount);
-  }
-
-
   filterSampleGrid() {
     this.props.filter(this.refs.filterInput.getInputDOMNode().value.trim());
   }
@@ -243,8 +238,7 @@ class SampleGridContainer extends React.Component {
 
 
   collectButton() {
-    const collectText = this.props.manualMount ? 'Collect' :
-                        `Collect Queue ${this.numSamplesPicked()}/${this.numSamples()}`;
+    const collectText = `Collect ${this.numSamplesPicked()}/${this.numSamples()}`;
 
     let button = (
       <Button
@@ -463,7 +457,6 @@ function mapStateToProps(state) {
     moving: state.sampleGrid.moving,
     sampleList: state.sampleGrid.sampleList,
     defaultParameters: state.taskForm.defaultParameters,
-    manualMount: state.sampleGrid.manualMount,
     filterText: state.sampleGrid.filterText,
     order: state.sampleGrid.order,
     sampleGridContextMenu: state.sampleGrid.contextMenu
